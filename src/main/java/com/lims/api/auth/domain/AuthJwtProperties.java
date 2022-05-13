@@ -11,30 +11,41 @@ public class AuthJwtProperties {
 
     public final Jwt jwt;
 
-    @RequiredArgsConstructor
-    static class Jwt {
-        public final String issuer = "lims";
+    public static class Jwt {
+        public final String issuer;
         public final String secret;
         public final AccessToken accessToken;
         public final RefreshToken refreshToken;
+
+        public Jwt(String issuer, String secret, AccessToken accessToken, RefreshToken refreshToken) {
+            this.issuer = issuer == null ? "lims" : issuer;
+            this.secret = secret;
+            this.accessToken = accessToken;
+            this.refreshToken = refreshToken;
+        }
     }
 
     @RequiredArgsConstructor
-    static class AccessToken {
+    public static class AccessToken {
         public final Expire expire;
     }
 
     @RequiredArgsConstructor
-    static class RefreshToken {
+    public static class RefreshToken {
         public final Expire expire;
     }
 
-    @RequiredArgsConstructor
-    static class Expire {
-        public final Long days = 0L;
-        public final Long hours = 0L;
-        public final Long minutes = 0L;
-        public final Long seconds = 0L;
-    }
+    public static class Expire {
+        public final Long days;
+        public final Long hours;
+        public final Long minutes;
+        public final Long seconds;
 
+        public Expire(Long days, Long hours, Long minutes, Long seconds) {
+            this.days = days == null ? 0L : days;
+            this.hours = hours == null ? 0L : hours;
+            this.minutes = minutes == null ? 0L : minutes;
+            this.seconds = seconds == null ? 0L : seconds;
+        }
+    }
 }

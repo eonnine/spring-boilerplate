@@ -20,7 +20,6 @@ spring:
 
 auth:
   jwt:
-    issuer: lims
     secret: ABC123
     access-token:
       expire:

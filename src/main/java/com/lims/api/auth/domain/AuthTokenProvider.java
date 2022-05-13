@@ -4,8 +4,8 @@ public interface AuthTokenProvider {
 
     public AuthToken generate(String username, String password);
 
-    public boolean verify(AuthToken token);
+    public boolean verify(String token);
 
-    public AuthToken refresh(AuthToken token);
+    public AuthToken refresh(AuthToken authToken);
 
 }

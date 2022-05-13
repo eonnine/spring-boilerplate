@@ -1,13 +1,11 @@
 package com.lims.api;
 
-import com.lims.api.auth.domain.AuthJwtProperties;
-import com.lims.api.auth.domain.AuthProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 
 @SpringBootApplication
-@EnableConfigurationProperties({AuthJwtProperties.class})
+@ConfigurationPropertiesScan
 public class Application {
 
     public static void main(String[] args) { SpringApplication.run(Application.class, args); }
