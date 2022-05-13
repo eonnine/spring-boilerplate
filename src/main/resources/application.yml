@@ -1,0 +1,36 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      force: true
+  shutdown: graceful
+  forward-headers-strategy: native
+
+spring:
+  devtools:
+    livereload:
+      enabled: true
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@203.229.218.221:22221:iit
+    username: SL_USER
+    password: SLUSER
+
+auth:
+  jwt:
+    issuer: lims
+    secret: ABC123
+    access-token:
+      expire:
+        minutes: 30
+    refresh-token:
+      expire:
+        hours: 2
+
+logging:
+  charset:
+    console: UTF-8
+  level:
+    com.lims.api: debug
