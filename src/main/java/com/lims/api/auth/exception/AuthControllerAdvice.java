@@ -2,7 +2,7 @@ package com.lims.api.auth.exception;
 
 import com.lims.api.exception.domain.UnAuthenticatedException;
 import com.lims.api.exception.model.ErrorResponse;
-import com.lims.api.util.i18n.domain.LocaleMessageSource;
+import com.lims.api.util.i18n.service.LocaleMessageSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
