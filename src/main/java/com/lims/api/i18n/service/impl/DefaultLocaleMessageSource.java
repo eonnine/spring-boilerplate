@@ -1,6 +1,6 @@
-package com.lims.api.util.i18n.service.impl;
+package com.lims.api.i18n.service.impl;
 
-import com.lims.api.util.i18n.service.LocaleMessageSource;
+import com.lims.api.i18n.service.LocaleMessageSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
