@@ -4,25 +4,19 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 public class AuthJWTProvider implements AuthTokenProvider {
 
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-
-    private final AuthJwtProperties authProperties;
+    private final AuthProperties authProperties;
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
     private final Map<String, Object> header = Map.of(
@@ -30,7 +24,7 @@ public class AuthJWTProvider implements AuthTokenProvider {
             "typ", "JWT"
     );
 
-    public AuthJWTProvider(AuthJwtProperties authProperties) {
+    public AuthJWTProvider(AuthProperties authProperties) {
         Algorithm algorithm = Algorithm.HMAC256(authProperties.jwt.secret);
 
         this.authProperties = authProperties;
@@ -64,7 +58,7 @@ public class AuthJWTProvider implements AuthTokenProvider {
             verifier.verify(token);
             return true;
         } catch (JWTVerificationException e) {
-            logger.info("[{}] Token authentication failed. {}", this.getClass(), e.getMessage());
+            log.info("[{}] Token authentication failed. {}", this.getClass(), e.getMessage());
             return false;
         } catch (Exception e){
             e.printStackTrace();
@@ -83,7 +77,6 @@ public class AuthJWTProvider implements AuthTokenProvider {
     }
 
     private String createToken(Date expiresAt) {
-        // TODO add Custom Claims
         return JWT.create()
                 .withHeader(header)
                 .withIssuer(authProperties.jwt.issuer)
@@ -97,16 +90,12 @@ public class AuthJWTProvider implements AuthTokenProvider {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    private Date getExpiresAt(AuthJwtProperties.Expire expire) {
+    private Date getExpiresAt(AuthProperties.Expire expire) {
         return dateOf(LocalDateTime.now()
                 .plusDays(expire.days)
                 .plusHours(expire.hours)
                 .plusMinutes(expire.minutes)
                 .plusSeconds(expire.seconds));
-    }
-
-    private Map<String, Object> getClaims() {
-        return new HashMap<String, Object>();
     }
 
 }

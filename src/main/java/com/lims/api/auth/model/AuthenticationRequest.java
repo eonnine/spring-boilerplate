@@ -1,12 +1,16 @@
 package com.lims.api.auth.model;
 
-import com.auth0.jwt.interfaces.Claim;
 import lombok.Getter;
+
+import javax.validation.constraints.NotBlank;
 
 @Getter
 public class AuthenticationRequest {
 
+    @NotBlank
     private String username;
+
+    @NotBlank
     private String password;
 
 }

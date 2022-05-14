@@ -23,6 +23,7 @@ auth:
     secret: ABC123
     access-token:
       expire:
+        days: 10
         minutes: 30
     refresh-token:
       expire:

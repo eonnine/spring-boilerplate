@@ -7,8 +7,8 @@ import java.util.Map;
 public class AuthJWT extends AuthToken {
 
     @Builder
-    public AuthJWT(String accessToken, String refreshToken, Map<String, Object> claims) {
-        super(accessToken, refreshToken, claims);
+    public AuthJWT(String accessToken, String refreshToken) {
+        super(accessToken, refreshToken);
     }
 
 }
