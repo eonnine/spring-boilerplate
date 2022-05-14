@@ -1,6 +1,7 @@
 package com.lims.api.auth.domain;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.SameSiteCookies;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
@@ -15,13 +16,17 @@ public class AuthProperties {
         public final String issuer;
         public final String secret;
         public final Boolean secure;
+        public final Boolean httpOnly;
+        public final String sameSite;
         public final AccessToken accessToken;
         public final RefreshToken refreshToken;
 
-        public Jwt(String issuer, String secret, Boolean secure, AccessToken accessToken, RefreshToken refreshToken) {
+        public Jwt(String issuer, String secret, Boolean secure, Boolean httpOnly, String sameSite, AccessToken accessToken, RefreshToken refreshToken) {
             this.issuer = issuer == null ? "lims" : issuer;
             this.secret = secret;
             this.secure = secure == null ? false : secure;
+            this.httpOnly = httpOnly == null ? true : httpOnly;
+            this.sameSite = sameSite == null ? SameSiteCookies.STRICT.getValue() : sameSite;
             this.accessToken = accessToken;
             this.refreshToken = refreshToken;
         }
@@ -34,10 +39,12 @@ public class AuthProperties {
         public AccessToken(Expire expire, Cookie cookie) {
             this.expire = expire;
 
+            Long maxAge = expire == null ? 0L : expire.getMaxAge();
+
             if (cookie != null && cookie.name != null) {
-                this.cookie = new Cookie(cookie.name, expire);
+                this.cookie = new Cookie(cookie.name, maxAge);
             } else  {
-                this.cookie = new Cookie("access-token", expire);
+                this.cookie = new Cookie("access-token", maxAge);
             }
         }
     }
@@ -49,10 +56,12 @@ public class AuthProperties {
         public RefreshToken(Expire expire, Cookie cookie) {
             this.expire = expire;
 
+            Long maxAge = expire == null ? 0L : expire.getMaxAge();
+
             if (cookie != null && cookie.name != null) {
-                this.cookie = new Cookie(cookie.name, expire);
+                this.cookie = new Cookie(cookie.name, maxAge);
             } else  {
-                this.cookie = new Cookie("refresh-token", expire);
+                this.cookie = new Cookie("refresh-token", maxAge);
             }
         }
     }
@@ -72,7 +81,7 @@ public class AuthProperties {
             this.seconds = seconds == null ? DefaultValue : seconds;
         }
 
-        public Long getMaxAge() {
+        private Long getMaxAge() {
             Long maxAge = 0L;
             if (isExistsValue(this.days)) {
                 maxAge += this.days * 24L * 60L * 60L;
@@ -98,9 +107,9 @@ public class AuthProperties {
         public final String name;
         public final Long maxAge;
 
-        public Cookie(String name, Expire expire) {
+        public Cookie(String name, Long maxAge) {
             this.name = name;
-            this.maxAge = expire == null ? 0L : expire.getMaxAge();
+            this.maxAge = maxAge;
         }
 
     }

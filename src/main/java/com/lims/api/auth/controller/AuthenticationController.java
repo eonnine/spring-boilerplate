@@ -33,16 +33,16 @@ public class AuthenticationController {
                 .from(authProperties.jwt.accessToken.cookie.name, authToken.getAccessToken())
                 .maxAge(authProperties.jwt.accessToken.cookie.maxAge)
                 .secure(authProperties.jwt.secure)
-                .sameSite(Cookie.SameSite.STRICT.attributeValue())
-                .httpOnly(true)
+                .sameSite(authProperties.jwt.sameSite)
+                .httpOnly(authProperties.jwt.httpOnly)
                 .build();
 
         ResponseCookie refreshTokenCookie = ResponseCookie
                 .from(authProperties.jwt.refreshToken.cookie.name, authToken.getRefreshToken())
                 .maxAge(authProperties.jwt.refreshToken.cookie.maxAge)
                 .secure(authProperties.jwt.secure)
-                .sameSite(Cookie.SameSite.STRICT.attributeValue())
-                .httpOnly(true)
+                .sameSite(authProperties.jwt.sameSite)
+                .httpOnly(authProperties.jwt.httpOnly)
                 .build();
 
         return ResponseEntity
