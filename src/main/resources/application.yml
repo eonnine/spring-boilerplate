@@ -8,12 +8,10 @@ server:
   shutdown: graceful
   forward-headers-strategy: native
   error:
+    include-message: always
     whitelabel:
       enabled: false
-    include-exception: false
-    include-message: always
-    include-stacktrace: never
-    include-binding-errors: never
+
 
 spring:
   devtools:
