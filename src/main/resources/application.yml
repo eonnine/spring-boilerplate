@@ -7,6 +7,13 @@ server:
       force: true
   shutdown: graceful
   forward-headers-strategy: native
+  error:
+    whitelabel:
+      enabled: false
+    include-exception: false
+    include-message: always
+    include-stacktrace: never
+    include-binding-errors: never
 
 spring:
   devtools:
@@ -17,6 +24,8 @@ spring:
     url: jdbc:oracle:thin:@203.229.218.221:22221:iit
     username: SL_USER
     password: SLUSER
+  messages:
+    encoding: UTF-8
 
 auth:
   jwt:

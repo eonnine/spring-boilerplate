@@ -8,10 +8,7 @@ import com.lims.api.auth.model.AuthenticationRequest;
 import com.lims.api.auth.model.AuthenticationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.server.Cookie;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,17 +46,19 @@ public class AuthenticationController {
                 .build();
 
         return ResponseEntity
-                .ok()
+                .status(HttpStatus.CREATED)
                 .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
                 .body(AuthenticationResponse.of(authToken));
     }
 
+    // TODO get Token From Header in Parameter
     @PostMapping(value = "verification")
     public ResponseEntity<Boolean> verifyToken(@RequestBody AuthJWT token, HttpServletRequest request) {
         return ResponseEntity.ok().body(authTokenProvider.verify(token.getAccessToken()));
     }
 
+    // TODO get Token From Header in Parameter
     @PostMapping(value = "token")
     public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody AuthJWT token) {
         return ResponseEntity.ok().body(AuthenticationResponse.of(authTokenProvider.refresh(token)));

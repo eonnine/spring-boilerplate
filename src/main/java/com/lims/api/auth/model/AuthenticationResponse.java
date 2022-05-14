@@ -2,7 +2,9 @@ package com.lims.api.auth.model;
 
 import com.lims.api.auth.domain.AuthToken;
 import lombok.Builder;
+import lombok.Getter;
 
+@Getter
 @Builder
 public class AuthenticationResponse {
 

@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.lims.api.exception.domain.UnAuthenticatedException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -33,9 +34,12 @@ public class AuthJWTProvider implements AuthTokenProvider {
     }
 
     @Override
-    public AuthToken generate(String username, String password) {
+    public AuthToken generate(String username, String password) throws UnAuthenticatedException {
 
         // TODO validation using user data
+        if (username.equals("ERROR")) {
+            throw new UnAuthenticatedException("error.auth.unauthenticated");
+        }
 
         try {
             Date accessTokenExpiresAt = getExpiresAt(authProperties.jwt.accessToken.expire);
@@ -58,7 +62,7 @@ public class AuthJWTProvider implements AuthTokenProvider {
             verifier.verify(token);
             return true;
         } catch (JWTVerificationException e) {
-            log.info("[{}] Token authentication failed. {}", this.getClass(), e.getMessage());
+            log.info("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
             return false;
         } catch (Exception e){
             e.printStackTrace();
