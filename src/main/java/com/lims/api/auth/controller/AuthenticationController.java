@@ -3,7 +3,7 @@ package com.lims.api.auth.controller;
 import com.lims.api.auth.domain.AuthJWT;
 import com.lims.api.auth.domain.AuthProperties;
 import com.lims.api.auth.domain.AuthToken;
-import com.lims.api.auth.domain.AuthTokenProvider;
+import com.lims.api.auth.service.AuthTokenProvider;
 import com.lims.api.auth.model.AuthenticationRequest;
 import com.lims.api.auth.model.AuthenticationResponse;
 import lombok.RequiredArgsConstructor;

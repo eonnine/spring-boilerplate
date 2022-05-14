@@ -12,7 +12,6 @@ server:
     whitelabel:
       enabled: false
 
-
 spring:
   devtools:
     livereload:
