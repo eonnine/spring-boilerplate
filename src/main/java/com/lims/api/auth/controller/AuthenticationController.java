@@ -6,14 +6,13 @@ import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.service.AuthTokenProvider;
 import com.lims.api.auth.model.AuthenticationRequest;
 import com.lims.api.auth.model.AuthenticationResponse;
+import com.lims.api.exception.domain.UnAuthenticatedException;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.websocket.AuthenticationException;
 import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -26,7 +25,7 @@ public class AuthenticationController {
     private final AuthProperties authProperties;
 
     @PostMapping(value = "login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AuthenticationResponse> login(@Validated @RequestBody AuthenticationRequest request) {
+    public ResponseEntity<AuthenticationResponse> login(@Validated @RequestBody AuthenticationRequest request) throws UnAuthenticatedException {
         AuthToken authToken = authTokenProvider.generate(request.getUsername(), request.getPassword());
 
         ResponseCookie accessTokenCookie = ResponseCookie

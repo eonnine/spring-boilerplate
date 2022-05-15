@@ -54,6 +54,9 @@ public class AuthJWTProvider implements AuthTokenProvider {
                     .refreshToken(createToken(refreshTokenExpiresAt))
                     .build();
 
+        } catch (UnAuthenticatedException e) {
+            log.info("[{}] User Authenticate User", this.getClass());
+            throw e;
         } catch (Exception e) {
             e.printStackTrace();
             return AuthJWT.builder().build();

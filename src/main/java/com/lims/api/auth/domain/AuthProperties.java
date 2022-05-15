@@ -10,6 +10,7 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @RequiredArgsConstructor
 public class AuthProperties {
 
+    public final String type = "Bearer";
     public final Jwt jwt;
 
     public static class Jwt {
