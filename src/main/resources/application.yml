@@ -27,6 +27,9 @@ spring:
     password: SLUSER
   messages:
     encoding: UTF-8
+  output:
+    ansi:
+      enabled: detect
 
 auth:
   jwt:
@@ -42,4 +45,4 @@ logging:
   charset:
     console: UTF-8
   level:
-    com.lims.api: debug
+    com.lims: debug

@@ -26,6 +26,30 @@ public class AuthenticationController {
     @PostMapping(value = "login", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<AuthenticationResponse> login(@Validated @RequestBody AuthenticationRequest request) throws UnAuthenticatedException {
         AuthToken authToken = authTokenProvider.generate(request.getUsername(), request.getPassword());
+        HttpHeaders headers = makeAuthenticationHeaders(authToken);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .headers(headers)
+                .body(AuthenticationResponse.of(authToken));
+    }
+
+    @PostMapping(value = "verification")
+    public ResponseEntity<Boolean> verifyToken(@UseAuthToken AuthToken token) {
+        return ResponseEntity.ok().body(authTokenProvider.verify(token.getAccessToken()));
+    }
+
+    @PostMapping(value = "token")
+    public ResponseEntity<AuthenticationResponse> refreshToken(@UseAuthToken AuthToken token) throws UnAuthenticatedException {
+        AuthToken authToken = authTokenProvider.refresh(token.getRefreshToken());
+        HttpHeaders headers = makeAuthenticationHeaders(authToken);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .headers(headers)
+                .body(AuthenticationResponse.of(authToken));
+    }
+
+    private HttpHeaders makeAuthenticationHeaders(AuthToken authToken) {
+        HttpHeaders httpHeaders = new HttpHeaders();
 
         ResponseCookie accessTokenCookie = ResponseCookie
                 .from(authProperties.jwt.accessToken.cookie.name, authToken.getAccessToken())
@@ -45,21 +69,10 @@ public class AuthenticationController {
                 .path("/")
                 .build();
 
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .header(HttpHeaders.SET_COOKIE, accessTokenCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString())
-                .body(AuthenticationResponse.of(authToken));
-    }
+        httpHeaders.add(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        httpHeaders.add(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
 
-    @PostMapping(value = "verification")
-    public ResponseEntity<Boolean> verifyToken(@UseAuthToken AuthToken token) {
-        return ResponseEntity.ok().body(authTokenProvider.verify(token.getAccessToken()));
-    }
-
-    @PostMapping(value = "token")
-    public ResponseEntity<AuthenticationResponse> refreshToken(@UseAuthToken AuthToken token) throws UnAuthenticatedException {
-        return ResponseEntity.ok().body(AuthenticationResponse.of(authTokenProvider.refresh(token.getRefreshToken())));
+        return httpHeaders;
     }
 
 }
