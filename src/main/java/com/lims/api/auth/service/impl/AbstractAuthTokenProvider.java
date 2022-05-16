@@ -9,21 +9,21 @@ import com.lims.api.auth.domain.AuthJWT;
 import com.lims.api.auth.domain.AuthProperties;
 import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.service.AuthTokenProvider;
+import com.lims.api.common.domain.ValidationResult;
 import com.lims.api.exception.domain.UnAuthenticatedException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
-import org.springframework.stereotype.Service;
+import org.apache.tomcat.util.buf.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
 
 @Slf4j
-@Service
-public class AuthJWTProvider implements AuthTokenProvider {
+public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
 
-    private final AuthProperties.Strategy strategy;
     private final AuthProperties authProperties;
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
@@ -32,18 +32,20 @@ public class AuthJWTProvider implements AuthTokenProvider {
             "typ", "JWT"
     );
 
-    public AuthJWTProvider(AuthProperties authProperties) {
-        Algorithm algorithm = Algorithm.HMAC256(authProperties.jwt.secret);
-
-        this.strategy = authProperties.strategy;
+    public AbstractAuthTokenProvider(AuthProperties authProperties) {
         this.authProperties = authProperties;
-        this.algorithm = algorithm;
-        this.verifier = JWT.require(algorithm).withIssuer(authProperties.jwt.issuer).build();
+        this.algorithm = createJWTAlgorithm(authProperties);
+        this.verifier = createJWTVerifier(authProperties);
     }
+
+    public abstract String generateAccessToken();
+
+    public abstract String generateRefreshToken();
+
+    public abstract AuthToken getAuthToken(HttpServletRequest request);
 
     @Override
     public AuthToken generate(String username, String password) throws UnAuthenticatedException {
-
         // TODO validation using user data
         if (username.equals("ERROR")) {
             throw new UnAuthenticatedException("error.auth.unauthenticated");
@@ -64,44 +66,15 @@ public class AuthJWTProvider implements AuthTokenProvider {
             e.printStackTrace();
             return AuthJWT.builder().build();
         }
-    }
-
-    @Override
-    public boolean verify(String token) {
-        try {
-            if (Strings.isEmpty(token)) {
-                return false;
-            }
-
-            if (strategy.isHeader()) {
-                String[] bearerTokens = token.split(" ");
-
-                if (!authProperties.type.equals(bearerTokens[0])) {
-                    log.info("[{}] Invalid token type.", this.getClass());
-                    return false;
-                }
-                token = bearerTokens[1];
-            }
-
-            verifier.verify(token);
-            return true;
-        } catch (JWTVerificationException e) {
-            log.info("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
-            return false;
-        } catch (Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
+    };
 
     @Override
     public AuthToken refresh(String refreshToken) throws UnAuthenticatedException {
         try {
-            if (refreshToken == null || !verify(refreshToken)) {
+            ValidationResult validationResult = verify(refreshToken);
+            if (refreshToken == null || !validationResult.isVerified()) {
                 throw new UnAuthenticatedException("error.auth.invalidToken");
             }
-
-            DecodedJWT jwt = decodeJWT(refreshToken);
 
             // TODO input user claims
 
@@ -109,6 +82,7 @@ public class AuthJWTProvider implements AuthTokenProvider {
                     .accessToken(generateAccessToken())
                     .refreshToken(generateRefreshToken())
                     .build();
+
         } catch(UnAuthenticatedException e) {
             log.info("[{}] Failed to refresh issue auth token. {}", this.getClass(), e.getMessage());
             throw e;
@@ -116,23 +90,32 @@ public class AuthJWTProvider implements AuthTokenProvider {
             e.printStackTrace();
             return AuthJWT.builder().build();
         }
+    };
+
+    @Override
+    public ValidationResult verify(String token) {
+        try {
+            if (Strings.isEmpty(token)) {
+                return ValidationResult.builder().verified(false).build();
+            }
+            if (isBearerToken(token)) {
+                token = token.split(" ")[1];
+            }
+            verifier.verify(token);
+
+            return ValidationResult.builder().verified(true).build();
+
+        } catch (JWTVerificationException e) {
+            log.info("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
+            return ValidationResult.builder().verified(false).build();
+
+        } catch (Exception e){
+            e.printStackTrace();
+            return ValidationResult.builder().verified(false).build();
+        }
     }
 
-    private String generateAccessToken() {
-        Date accessTokenExpiresAt = getExpiresAt(authProperties.jwt.accessToken.expire);
-        return strategy.isCookie() ? createToken(accessTokenExpiresAt) : createBearerToken(accessTokenExpiresAt);
-    }
-
-    private String generateRefreshToken() {
-        Date refreshTokenExpiresAt = getExpiresAt(authProperties.jwt.refreshToken.expire);
-        return strategy.isCookie() ? createToken(refreshTokenExpiresAt) : createBearerToken(refreshTokenExpiresAt);
-    }
-
-    private String createBearerToken(Date expiresAt) {
-        return authProperties.type + " " + createToken(expiresAt);
-    }
-
-    private String createToken(Date expiresAt) {
+    protected String createToken(Date expiresAt) {
         return JWT.create()
                 .withHeader(header)
                 .withIssuer(authProperties.jwt.issuer)
@@ -140,28 +123,37 @@ public class AuthJWTProvider implements AuthTokenProvider {
                 .withIssuedAt(dateOf(LocalDateTime.now()))
                 .withExpiresAt(expiresAt)
                 .sign(algorithm);
+    };
+
+    protected DecodedJWT decodeJWT(String token) {
+        if (token == null) {
+            return null;
+        }
+        String jwt = isBearerToken(token) ? token.split(" ")[1] : token;
+        return JWT.decode(jwt);
+    }
+
+    private boolean isBearerToken(String token) {
+        return !Strings.isEmpty(token) && authProperties.type.equals(token.split(" ")[0]);
     }
 
     private Date dateOf(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    private Date getExpiresAt(AuthProperties.Expire expire) {
+    protected final Algorithm createJWTAlgorithm(AuthProperties authProperties) {
+        return algorithm == null ? Algorithm.HMAC256(authProperties.jwt.secret) : algorithm;
+    }
+
+    protected final JWTVerifier createJWTVerifier(AuthProperties authProperties) {
+        return verifier == null ? JWT.require(createJWTAlgorithm(authProperties)).withIssuer(authProperties.jwt.issuer).build() : verifier;
+    }
+
+    protected final Date getExpiresAt(AuthProperties.Expire expire) {
         return dateOf(LocalDateTime.now()
                 .plusDays(expire.days)
                 .plusHours(expire.hours)
                 .plusMinutes(expire.minutes)
                 .plusSeconds(expire.seconds));
     }
-
-    private DecodedJWT decodeJWT(String token) {
-        if (token == null) {
-            return null;
-        }
-
-        String jwt = strategy.isCookie() ? token : token.split(" ")[0];
-
-        return JWT.decode(jwt);
-    }
-
 }

@@ -6,6 +6,7 @@ import com.lims.api.auth.domain.UseAuthToken;
 import com.lims.api.auth.model.AuthenticationRequest;
 import com.lims.api.auth.model.AuthenticationResponse;
 import com.lims.api.auth.service.AuthTokenProvider;
+import com.lims.api.common.domain.ValidationResult;
 import com.lims.api.exception.domain.UnAuthenticatedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
@@ -22,9 +23,9 @@ public class AuthenticationController {
     private final AuthTokenProvider authTokenProvider;
     private final AuthProperties authProperties;
 
-    @GetMapping(value = "login")
+    @PostMapping(value = "login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) throws UnAuthenticatedException {
-        AuthToken authToken = authTokenProvider.generate("123", "123");
+        AuthToken authToken = authTokenProvider.generate(request.getUsername(), request.getPassword());
         return sendAuthenticationResponse(authToken);
     }
 
@@ -36,7 +37,8 @@ public class AuthenticationController {
 
     @GetMapping(value = "verification")
     public ResponseEntity<Boolean> verifyToken(@UseAuthToken AuthToken token) {
-        return ResponseEntity.ok().body(authTokenProvider.verify(token.getAccessToken()));
+        ValidationResult result = authTokenProvider.verify(token.getAccessToken());
+        return ResponseEntity.ok().body(result.isVerified());
     }
 
     private ResponseEntity<AuthenticationResponse> sendAuthenticationResponse(AuthToken authToken) {

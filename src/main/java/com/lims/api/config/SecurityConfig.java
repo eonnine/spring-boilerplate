@@ -1,9 +1,6 @@
 package com.lims.api.config;
 
-import com.lims.api.auth.domain.AuthProperties;
-import com.lims.api.auth.service.impl.AuthJWTProvider;
 import com.lims.api.filter.AuthCheckFilter;
-import com.lims.api.i18n.service.LocaleMessageSource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
