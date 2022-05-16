@@ -22,7 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthCheckFilter implements Filter {
 
-    private static final String[] ALLOW_LIST = {"/auth/**", "/error", "/error/**", "/test"};
+    private static final String[] ALLOW_LIST = {"/auth/**", "/error", "/error/**"};
 
     private final AuthProperties authProperties;
     private final AuthJWTProvider authJWTProvider;
@@ -38,15 +38,9 @@ public class AuthCheckFilter implements Filter {
             if (isCheckURI(requestURI)) {
                 String accessToken = getAccessToken(request);
 
-                 if (accessToken == null) {
-                    sendAuthError(response, "error.auth.notFoundAuthorization");
-                    return;
-                 }
-
-                String tokenType = accessToken.split(" ")[0];
-                if (!authProperties.type.equals(tokenType)) {
-                    sendAuthError(response, "error.auth.noSuchTokenType");
-                    return;
+                if (accessToken == null) {
+                sendAuthError(response, "error.auth.notFoundAuthorization");
+                return;
                 }
 
                 boolean isVerified = authJWTProvider.verify(accessToken);

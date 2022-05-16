@@ -58,7 +58,7 @@ public class AuthenticationController {
     }
 
     @PostMapping(value = "token")
-    public ResponseEntity<AuthenticationResponse> refreshToken(@UseAuthToken AuthToken token) {
+    public ResponseEntity<AuthenticationResponse> refreshToken(@UseAuthToken AuthToken token) throws UnAuthenticatedException {
         return ResponseEntity.ok().body(AuthenticationResponse.of(authTokenProvider.refresh(token.getRefreshToken())));
     }
 

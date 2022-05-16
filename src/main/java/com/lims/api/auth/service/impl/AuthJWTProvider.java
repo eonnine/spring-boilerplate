@@ -11,6 +11,7 @@ import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.service.AuthTokenProvider;
 import com.lims.api.exception.domain.UnAuthenticatedException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -69,14 +70,10 @@ public class AuthJWTProvider implements AuthTokenProvider {
     @Override
     public boolean verify(String token) {
         try {
-            String[] bearerTokens = token.split(" ");
-
-            if (bearerTokens == null || !authProperties.type.equals(bearerTokens[0]) ) {
+            if (Strings.isEmpty(token)) {
                 return false;
             }
-
-            verifier.verify(bearerTokens[1]);
-
+            verifier.verify(token);
             return true;
         } catch (JWTVerificationException e) {
             log.info("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
@@ -88,12 +85,15 @@ public class AuthJWTProvider implements AuthTokenProvider {
     }
 
     @Override
-    public AuthToken refresh(String refreshToken) {
-        if (verify(refreshToken)) {
-            DecodedJWT jwt = JWT.decode(refreshToken);
-
+    public AuthToken refresh(String refreshToken) throws UnAuthenticatedException {
+        try {
+            if (refreshToken == null || !verify(refreshToken)) {
+                throw new UnAuthenticatedException("error.auth.invalidToken");
+            }
             Date accessTokenExpiresAt = getExpiresAt(authProperties.jwt.accessToken.expire);
             Date refreshTokenExpiresAt = getExpiresAt(authProperties.jwt.refreshToken.expire);
+
+            DecodedJWT jwt = JWT.decode(refreshToken);
 
             // TODO input user claims
 
@@ -101,13 +101,17 @@ public class AuthJWTProvider implements AuthTokenProvider {
                     .accessToken(createToken(accessTokenExpiresAt))
                     .refreshToken(createToken(refreshTokenExpiresAt))
                     .build();
+        } catch(UnAuthenticatedException e) {
+            log.info("[{}] Failed to refresh issue auth token. {}", this.getClass(), e.getMessage());
+            throw e;
+        } catch(Exception e) {
+            e.printStackTrace();
+            return AuthJWT.builder().build();
         }
-
-        return AuthJWT.builder().build();
     }
 
     private String createToken(Date expiresAt) {
-        return authProperties.type + " " + JWT.create()
+        return JWT.create()
                 .withHeader(header)
                 .withIssuer(authProperties.jwt.issuer)
                 .withNotBefore(dateOf(LocalDateTime.now()))
