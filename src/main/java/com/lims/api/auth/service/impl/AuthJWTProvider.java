@@ -23,6 +23,7 @@ import java.util.Map;
 @Service
 public class AuthJWTProvider implements AuthTokenProvider {
 
+    private final AuthProperties.Strategy strategy;
     private final AuthProperties authProperties;
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
@@ -34,6 +35,7 @@ public class AuthJWTProvider implements AuthTokenProvider {
     public AuthJWTProvider(AuthProperties authProperties) {
         Algorithm algorithm = Algorithm.HMAC256(authProperties.jwt.secret);
 
+        this.strategy = authProperties.strategy;
         this.authProperties = authProperties;
         this.algorithm = algorithm;
         this.verifier = JWT.require(algorithm).withIssuer(authProperties.jwt.issuer).build();
@@ -48,14 +50,11 @@ public class AuthJWTProvider implements AuthTokenProvider {
         }
 
         try {
-            Date accessTokenExpiresAt = getExpiresAt(authProperties.jwt.accessToken.expire);
-            Date refreshTokenExpiresAt = getExpiresAt(authProperties.jwt.refreshToken.expire);
-
             // TODO input user claims
 
             return AuthJWT.builder()
-                    .accessToken(createToken(accessTokenExpiresAt))
-                    .refreshToken(createToken(refreshTokenExpiresAt))
+                    .accessToken(generateAccessToken())
+                    .refreshToken(generateRefreshToken())
                     .build();
 
         } catch (UnAuthenticatedException e) {
@@ -73,6 +72,17 @@ public class AuthJWTProvider implements AuthTokenProvider {
             if (Strings.isEmpty(token)) {
                 return false;
             }
+
+            if (strategy.isHeader()) {
+                String[] bearerTokens = token.split(" ");
+
+                if (!authProperties.type.equals(bearerTokens[0])) {
+                    log.info("[{}] Invalid token type.", this.getClass());
+                    return false;
+                }
+                token = bearerTokens[1];
+            }
+
             verifier.verify(token);
             return true;
         } catch (JWTVerificationException e) {
@@ -90,16 +100,14 @@ public class AuthJWTProvider implements AuthTokenProvider {
             if (refreshToken == null || !verify(refreshToken)) {
                 throw new UnAuthenticatedException("error.auth.invalidToken");
             }
-            Date accessTokenExpiresAt = getExpiresAt(authProperties.jwt.accessToken.expire);
-            Date refreshTokenExpiresAt = getExpiresAt(authProperties.jwt.refreshToken.expire);
 
-            DecodedJWT jwt = JWT.decode(refreshToken);
+            DecodedJWT jwt = decodeJWT(refreshToken);
 
             // TODO input user claims
 
             return AuthJWT.builder()
-                    .accessToken(createToken(accessTokenExpiresAt))
-                    .refreshToken(createToken(refreshTokenExpiresAt))
+                    .accessToken(generateAccessToken())
+                    .refreshToken(generateRefreshToken())
                     .build();
         } catch(UnAuthenticatedException e) {
             log.info("[{}] Failed to refresh issue auth token. {}", this.getClass(), e.getMessage());
@@ -108,6 +116,20 @@ public class AuthJWTProvider implements AuthTokenProvider {
             e.printStackTrace();
             return AuthJWT.builder().build();
         }
+    }
+
+    private String generateAccessToken() {
+        Date accessTokenExpiresAt = getExpiresAt(authProperties.jwt.accessToken.expire);
+        return strategy.isCookie() ? createToken(accessTokenExpiresAt) : createBearerToken(accessTokenExpiresAt);
+    }
+
+    private String generateRefreshToken() {
+        Date refreshTokenExpiresAt = getExpiresAt(authProperties.jwt.refreshToken.expire);
+        return strategy.isCookie() ? createToken(refreshTokenExpiresAt) : createBearerToken(refreshTokenExpiresAt);
+    }
+
+    private String createBearerToken(Date expiresAt) {
+        return authProperties.type + " " + createToken(expiresAt);
     }
 
     private String createToken(Date expiresAt) {
@@ -130,6 +152,16 @@ public class AuthJWTProvider implements AuthTokenProvider {
                 .plusHours(expire.hours)
                 .plusMinutes(expire.minutes)
                 .plusSeconds(expire.seconds));
+    }
+
+    private DecodedJWT decodeJWT(String token) {
+        if (token == null) {
+            return null;
+        }
+
+        String jwt = strategy.isCookie() ? token : token.split(" ")[0];
+
+        return JWT.decode(jwt);
     }
 
 }

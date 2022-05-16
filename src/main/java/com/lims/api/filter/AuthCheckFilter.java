@@ -22,7 +22,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthCheckFilter implements Filter {
 
-    private static final String[] ALLOW_LIST = {"/auth/**", "/error", "/error/**"};
+    private final String[] allowUrlPatterns = {"/auth/**", "/error", "/error/**"};
 
     private final AuthProperties authProperties;
     private final AuthJWTProvider authJWTProvider;
@@ -33,20 +33,12 @@ public class AuthCheckFilter implements Filter {
         try {
             HttpServletRequest request = (HttpServletRequest) servletRequest;
             HttpServletResponse response = (HttpServletResponse) servletResponse;
-            String requestURI = request.getRequestURI();
 
-            if (isCheckURI(requestURI)) {
-                String accessToken = getAccessToken(request);
-
-                if (accessToken == null) {
-                sendAuthError(response, "error.auth.notFoundAuthorization");
-                return;
+            if (isCheckURI(request.getRequestURI())) {
+                if (authProperties.strategy.isCookie() && !isValidCookieBasedAuth(request, response)) {
+                    return;
                 }
-
-                boolean isVerified = authJWTProvider.verify(accessToken);
-
-                if (!isVerified) {
-                    sendAuthError(response, "error.auth.invalidToken");
+                else if (authProperties.strategy.isHeader() && !isValidHeaderBasedAuth(request, response)) {
                     return;
                 }
             }
@@ -58,11 +50,47 @@ public class AuthCheckFilter implements Filter {
         }
     }
 
-    private boolean isCheckURI(String uri) {
-        return !PatternMatchUtils.simpleMatch(ALLOW_LIST, uri);
+    private boolean isValidCookieBasedAuth(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String accessToken = getAccessTokenAtCookie(request);
+        if (accessToken == null) {
+            sendAuthError(response, "error.auth.notFoundAuthorization");
+            return false;
+        }
+
+        boolean isVerified = authJWTProvider.verify(accessToken);
+        if (!isVerified) {
+            sendAuthError(response, "error.auth.invalidToken");
+            return false;
+        }
+        return true;
     }
 
-    private String getAccessToken(HttpServletRequest request) {
+    private boolean isValidHeaderBasedAuth(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String bearerAccessToken = request.getHeader(authProperties.authHeaderName);
+        if (bearerAccessToken == null) {
+            sendAuthError(response, "error.auth.notFoundAuthorization");
+            return false;
+        }
+
+        String tokenType = bearerAccessToken.split(" ")[0];
+        if (!authProperties.type.equals(tokenType)) {
+            sendAuthError(response, "error.auth.notDefineTokenType");
+            return false;
+        }
+
+        boolean isVerified = authJWTProvider.verify(bearerAccessToken);
+        if (!isVerified) {
+            sendAuthError(response, "error.auth.invalidToken");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isCheckURI(String uri) {
+        return !PatternMatchUtils.simpleMatch(allowUrlPatterns, uri);
+    }
+
+    private String getAccessTokenAtCookie(HttpServletRequest request) {
         return Arrays.stream(request.getCookies())
                 .filter(cookie -> authProperties.jwt.accessToken.cookie.name.equals(cookie.getName()))
                 .findAny()

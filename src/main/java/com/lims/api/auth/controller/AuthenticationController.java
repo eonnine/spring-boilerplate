@@ -1,19 +1,18 @@
 package com.lims.api.auth.controller;
 
-import com.lims.api.auth.domain.AuthJWT;
 import com.lims.api.auth.domain.AuthProperties;
 import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.domain.UseAuthToken;
-import com.lims.api.auth.service.AuthTokenProvider;
 import com.lims.api.auth.model.AuthenticationRequest;
 import com.lims.api.auth.model.AuthenticationResponse;
+import com.lims.api.auth.service.AuthTokenProvider;
 import com.lims.api.exception.domain.UnAuthenticatedException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.*;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping(value = "auth")
@@ -23,32 +22,43 @@ public class AuthenticationController {
     private final AuthTokenProvider authTokenProvider;
     private final AuthProperties authProperties;
 
-    @PostMapping(value = "login", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<AuthenticationResponse> login(@Validated @RequestBody AuthenticationRequest request) throws UnAuthenticatedException {
-        AuthToken authToken = authTokenProvider.generate(request.getUsername(), request.getPassword());
-        HttpHeaders headers = makeAuthenticationHeaders(authToken);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .headers(headers)
-                .body(AuthenticationResponse.of(authToken));
-    }
-
-    @PostMapping(value = "verification")
-    public ResponseEntity<Boolean> verifyToken(@UseAuthToken AuthToken token) {
-        return ResponseEntity.ok().body(authTokenProvider.verify(token.getAccessToken()));
+    @GetMapping(value = "login")
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) throws UnAuthenticatedException {
+        AuthToken authToken = authTokenProvider.generate("123", "123");
+        return sendAuthenticationResponse(authToken);
     }
 
     @PostMapping(value = "token")
     public ResponseEntity<AuthenticationResponse> refreshToken(@UseAuthToken AuthToken token) throws UnAuthenticatedException {
         AuthToken authToken = authTokenProvider.refresh(token.getRefreshToken());
-        HttpHeaders headers = makeAuthenticationHeaders(authToken);
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .headers(headers)
-                .body(AuthenticationResponse.of(authToken));
+        return sendAuthenticationResponse(authToken);
     }
 
-    private HttpHeaders makeAuthenticationHeaders(AuthToken authToken) {
+    @GetMapping(value = "verification")
+    public ResponseEntity<Boolean> verifyToken(@UseAuthToken AuthToken token) {
+        return ResponseEntity.ok().body(authTokenProvider.verify(token.getAccessToken()));
+    }
+
+    private ResponseEntity<AuthenticationResponse> sendAuthenticationResponse(AuthToken authToken) {
+        if (authProperties.strategy.isCookie()) {
+            HttpHeaders headers =  makeCookieHeaders(authToken);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .headers(headers)
+                    .body(null);
+        }
+        else if(authProperties.strategy.isHeader()) {
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(AuthenticationResponse.of(authToken));
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.UNAUTHORIZED)
+                .body(null);
+    }
+
+    private HttpHeaders makeCookieHeaders(AuthToken authToken) {
         HttpHeaders httpHeaders = new HttpHeaders();
 
         ResponseCookie accessTokenCookie = ResponseCookie

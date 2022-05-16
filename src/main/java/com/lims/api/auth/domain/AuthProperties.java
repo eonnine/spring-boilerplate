@@ -1,17 +1,36 @@
 package com.lims.api.auth.domain;
 
-import lombok.RequiredArgsConstructor;
 import org.apache.tomcat.util.http.SameSiteCookies;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 
 @ConstructorBinding
 @ConfigurationProperties(prefix = "auth")
-@RequiredArgsConstructor
 public class AuthProperties {
 
-    public final String type = "Bearer";
+    public final String authHeaderName = "authorization";
+    public final String type;
+    public final Strategy strategy;
     public final Jwt jwt;
+
+    public AuthProperties(String type, Jwt jwt, Strategy strategy) {
+        this.type = type == null ? "Bearer" : type;
+        this.strategy = strategy == null ? Strategy.cookie : strategy;
+        this.jwt = jwt;
+    }
+
+    public enum Strategy {
+        header,
+        cookie;
+
+        public boolean isHeader() {
+            return this.name() == Strategy.header.name();
+        }
+
+        public boolean isCookie() {
+            return this.name() == Strategy.cookie.name();
+        }
+    }
 
     public static class Jwt {
         public final String issuer;
