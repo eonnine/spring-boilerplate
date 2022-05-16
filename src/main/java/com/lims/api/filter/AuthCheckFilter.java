@@ -6,20 +6,24 @@ import com.lims.api.i18n.service.LocaleMessageSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.util.PatternMatchUtils;
 
 import javax.servlet.*;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Optional;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
-public class BearerAuthenticationCheckFilter implements Filter {
+public class AuthCheckFilter implements Filter {
 
-    private static final String[] ALLOW_LIST = {"/auth/**", "/error/**"};
+    private static final String[] ALLOW_LIST = {"/auth/**", "/error", "/error/**", "/test"};
 
-    private final String authHeaderName = "authorization";
     private final AuthProperties authProperties;
     private final AuthJWTProvider authJWTProvider;
     private final LocaleMessageSource messageSource;
@@ -32,21 +36,19 @@ public class BearerAuthenticationCheckFilter implements Filter {
             String requestURI = request.getRequestURI();
 
             if (isCheckURI(requestURI)) {
-                String authHeader = request.getHeader(authHeaderName);
+                String accessToken = getAccessToken(request);
 
-                if (authHeader == null) {
-                    response.sendError(HttpStatus.FORBIDDEN.value());
+                 if (accessToken == null) {
+                    sendAuthError(response, "error.auth.notFoundAuthorization");
                     return;
-                }
+                 }
 
-                String[] bearerAuths = authHeader.split(" ");
-
-                if (!authProperties.type.equals(bearerAuths[0])) {
+                String tokenType = accessToken.split(" ")[0];
+                if (!authProperties.type.equals(tokenType)) {
                     sendAuthError(response, "error.auth.noSuchTokenType");
                     return;
                 }
 
-                String accessToken = bearerAuths[1];
                 boolean isVerified = authJWTProvider.verify(accessToken);
 
                 if (!isVerified) {
@@ -64,6 +66,14 @@ public class BearerAuthenticationCheckFilter implements Filter {
 
     private boolean isCheckURI(String uri) {
         return !PatternMatchUtils.simpleMatch(ALLOW_LIST, uri);
+    }
+
+    private String getAccessToken(HttpServletRequest request) {
+        return Arrays.stream(request.getCookies())
+                .filter(cookie -> authProperties.jwt.accessToken.cookie.name.equals(cookie.getName()))
+                .findAny()
+                .orElseGet(() -> new Cookie("empty", null))
+                .getValue();
     }
 
     private void sendAuthError(HttpServletResponse response, String messageCode) throws IOException {

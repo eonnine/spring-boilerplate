@@ -3,13 +3,12 @@ package com.lims.api.auth.controller;
 import com.lims.api.auth.domain.AuthJWT;
 import com.lims.api.auth.domain.AuthProperties;
 import com.lims.api.auth.domain.AuthToken;
+import com.lims.api.auth.domain.UseAuthToken;
 import com.lims.api.auth.service.AuthTokenProvider;
 import com.lims.api.auth.model.AuthenticationRequest;
 import com.lims.api.auth.model.AuthenticationResponse;
 import com.lims.api.exception.domain.UnAuthenticatedException;
 import lombok.RequiredArgsConstructor;
-import org.apache.tomcat.websocket.AuthenticationException;
-import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +33,7 @@ public class AuthenticationController {
                 .secure(authProperties.jwt.secure)
                 .sameSite(authProperties.jwt.sameSite)
                 .httpOnly(authProperties.jwt.httpOnly)
+                .path("/")
                 .build();
 
         ResponseCookie refreshTokenCookie = ResponseCookie
@@ -42,6 +42,7 @@ public class AuthenticationController {
                 .secure(authProperties.jwt.secure)
                 .sameSite(authProperties.jwt.sameSite)
                 .httpOnly(authProperties.jwt.httpOnly)
+                .path("/")
                 .build();
 
         return ResponseEntity
@@ -51,16 +52,14 @@ public class AuthenticationController {
                 .body(AuthenticationResponse.of(authToken));
     }
 
-    // TODO get Token From Header in Parameter
     @PostMapping(value = "verification")
-    public ResponseEntity<Boolean> verifyToken(@RequestBody AuthJWT token, HttpServletRequest request) {
+    public ResponseEntity<Boolean> verifyToken(@UseAuthToken AuthToken token) {
         return ResponseEntity.ok().body(authTokenProvider.verify(token.getAccessToken()));
     }
 
-    // TODO get Token From Header in Parameter
     @PostMapping(value = "token")
-    public ResponseEntity<AuthenticationResponse> refreshToken(@RequestBody AuthJWT token) {
-        return ResponseEntity.ok().body(AuthenticationResponse.of(authTokenProvider.refresh(token)));
+    public ResponseEntity<AuthenticationResponse> refreshToken(@UseAuthToken AuthToken token) {
+        return ResponseEntity.ok().body(AuthenticationResponse.of(authTokenProvider.refresh(token.getRefreshToken())));
     }
 
 }

@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.lims.api.auth.domain.AuthJWT;
 import com.lims.api.auth.domain.AuthProperties;
 import com.lims.api.auth.domain.AuthToken;
@@ -49,6 +50,8 @@ public class AuthJWTProvider implements AuthTokenProvider {
             Date accessTokenExpiresAt = getExpiresAt(authProperties.jwt.accessToken.expire);
             Date refreshTokenExpiresAt = getExpiresAt(authProperties.jwt.refreshToken.expire);
 
+            // TODO input user claims
+
             return AuthJWT.builder()
                     .accessToken(createToken(accessTokenExpiresAt))
                     .refreshToken(createToken(refreshTokenExpiresAt))
@@ -66,7 +69,14 @@ public class AuthJWTProvider implements AuthTokenProvider {
     @Override
     public boolean verify(String token) {
         try {
-            verifier.verify(token);
+            String[] bearerTokens = token.split(" ");
+
+            if (bearerTokens == null || !authProperties.type.equals(bearerTokens[0]) ) {
+                return false;
+            }
+
+            verifier.verify(bearerTokens[1]);
+
             return true;
         } catch (JWTVerificationException e) {
             log.info("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
@@ -78,17 +88,26 @@ public class AuthJWTProvider implements AuthTokenProvider {
     }
 
     @Override
-    public AuthToken refresh(AuthToken authToken) {
-        if (verify(authToken.getRefreshToken())) {
-            // TODO generate new AuthToken
-            return AuthJWT.builder().build();
+    public AuthToken refresh(String refreshToken) {
+        if (verify(refreshToken)) {
+            DecodedJWT jwt = JWT.decode(refreshToken);
+
+            Date accessTokenExpiresAt = getExpiresAt(authProperties.jwt.accessToken.expire);
+            Date refreshTokenExpiresAt = getExpiresAt(authProperties.jwt.refreshToken.expire);
+
+            // TODO input user claims
+
+            return AuthJWT.builder()
+                    .accessToken(createToken(accessTokenExpiresAt))
+                    .refreshToken(createToken(refreshTokenExpiresAt))
+                    .build();
         }
 
         return AuthJWT.builder().build();
     }
 
     private String createToken(Date expiresAt) {
-        return JWT.create()
+        return authProperties.type + " " + JWT.create()
                 .withHeader(header)
                 .withIssuer(authProperties.jwt.issuer)
                 .withNotBefore(dateOf(LocalDateTime.now()))

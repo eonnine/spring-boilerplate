@@ -8,6 +8,6 @@ public interface AuthTokenProvider {
 
     public boolean verify(String token);
 
-    public AuthToken refresh(AuthToken authToken);
+    public AuthToken refresh(String refreshToken);
 
 }

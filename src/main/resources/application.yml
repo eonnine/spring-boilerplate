@@ -9,8 +9,12 @@ server:
   forward-headers-strategy: native
   error:
     include-message: always
+    include-stacktrace: never
+    include-binding-errors: never
+    include-exception: false
     whitelabel:
       enabled: false
+
 
 spring:
   devtools:

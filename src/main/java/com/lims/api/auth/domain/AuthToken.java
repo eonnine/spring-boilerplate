@@ -1,13 +1,11 @@
 package com.lims.api.auth.domain;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
-import org.apache.tomcat.util.http.SameSiteCookies;
-import org.springframework.boot.web.server.Cookie;
-
-import java.util.Map;
 
 @Getter
+@Builder
 @AllArgsConstructor
 public class AuthToken {
 
