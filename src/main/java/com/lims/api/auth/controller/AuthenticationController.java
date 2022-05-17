@@ -22,13 +22,13 @@ public class AuthenticationController {
     private final AuthTokenProvider authTokenProvider;
     private final AuthProperties authProperties;
 
-    @PostMapping(value = "login")
+    @PostMapping(value = "token")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
         AuthToken authToken = authTokenProvider.generate(request.getUsername(), request.getPassword());
         return sendAuthenticationResponse(authToken);
     }
 
-    @PostMapping(value = "token")
+    @PostMapping(value = "reissue-token")
     public ResponseEntity<AuthenticationResponse> refreshToken(@UseAuthToken AuthToken token) {
         AuthToken authToken = authTokenProvider.refresh(token.getRefreshToken());
         return sendAuthenticationResponse(authToken);

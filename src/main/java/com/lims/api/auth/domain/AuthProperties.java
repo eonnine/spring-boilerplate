@@ -27,7 +27,6 @@ public class AuthProperties {
         public boolean isHeader() {
             return this.name() == Strategy.header.name();
         }
-
         public boolean isCookie() {
             return this.name() == Strategy.cookie.name();
         }
@@ -59,7 +58,6 @@ public class AuthProperties {
 
         public AccessToken(Expire expire, Cookie cookie) {
             this.expire = expire;
-
             Long maxAge = expire == null ? 0L : expire.getMaxAge();
 
             if (cookie != null && cookie.name != null) {
@@ -76,7 +74,6 @@ public class AuthProperties {
 
         public RefreshToken(Expire expire, Cookie cookie) {
             this.expire = expire;
-
             Long maxAge = expire == null ? 0L : expire.getMaxAge();
 
             if (cookie != null && cookie.name != null) {

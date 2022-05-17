@@ -30,7 +30,7 @@ public class AuthorizationFilter implements Filter {
             HttpServletRequest request = (HttpServletRequest) servletRequest;
             HttpServletResponse response = (HttpServletResponse) servletResponse;
 
-            if (isCheckURI(request.getRequestURI())) {
+            if (isTargetURI(request.getRequestURI())) {
                 AuthToken authToken = authTokenProvider.getAuthToken(request);
                 ValidationResult validationResult = authTokenProvider.verify(authToken.getAccessToken());
 
@@ -47,7 +47,7 @@ public class AuthorizationFilter implements Filter {
         }
     }
 
-    private boolean isCheckURI(String uri) {
+    private boolean isTargetURI(String uri) {
         return !PatternMatchUtils.simpleMatch(allowUrlPatterns, uri);
     }
 
