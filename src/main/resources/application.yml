@@ -36,10 +36,12 @@ auth:
     secret: SECRET_KEY
     access-token:
       expire:
-        minutes: 5
+        seconds: 10
+#        minutes: 30
     refresh-token:
       expire:
-        hours: 10
+        seconds: 20
+#        hours: 2
 
 logging:
   charset:

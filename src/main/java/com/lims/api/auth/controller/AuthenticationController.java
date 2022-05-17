@@ -28,13 +28,13 @@ public class AuthenticationController {
         return sendAuthenticationResponse(authToken);
     }
 
-    @PostMapping(value = "reissue-token")
+    @PostMapping(value = "token/reissue")
     public ResponseEntity<AuthenticationResponse> refreshToken(@UseAuthToken AuthToken token) {
         AuthToken authToken = authTokenProvider.refresh(token.getRefreshToken());
         return sendAuthenticationResponse(authToken);
     }
 
-    @GetMapping(value = "verification")
+    @GetMapping(value = "token/verification")
     public ResponseEntity<Boolean> verifyToken(@UseAuthToken AuthToken token) {
         ValidationResult result = authTokenProvider.verify(token.getAccessToken());
         return ResponseEntity.ok().body(result.isVerified());
