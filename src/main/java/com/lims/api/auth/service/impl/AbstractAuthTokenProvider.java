@@ -5,7 +5,6 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.lims.api.auth.domain.AuthJWT;
 import com.lims.api.auth.domain.AuthProperties;
 import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.service.AuthTokenProvider;
@@ -59,7 +58,7 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
 
             // TODO input user claims
 
-            return AuthJWT.builder()
+            return AuthToken.builder()
                     .accessToken(generateAccessToken())
                     .refreshToken(generateRefreshToken())
                     .build();
@@ -83,7 +82,7 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
 
             // TODO input user claims
 
-            return AuthJWT.builder()
+            return AuthToken.builder()
                     .accessToken(generateAccessToken())
                     .refreshToken(generateRefreshToken())
                     .build();
@@ -93,7 +92,7 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
             throw e;
         } catch(Exception e) {
             e.printStackTrace();
-            return AuthJWT.builder().build();
+            return AuthToken.builder().build();
         }
     };
 
