@@ -43,7 +43,6 @@ public class CookieAuthTokenProvider extends AbstractAuthTokenProvider {
                         .messageCode("error.auth.notFoundAuthorization")
                         .build();
             }
-
             JWTVerifier verifier = createJWTVerifier(authProperties);
             verifier.verify(token);
 

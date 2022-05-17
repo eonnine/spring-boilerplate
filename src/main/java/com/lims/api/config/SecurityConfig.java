@@ -1,6 +1,6 @@
 package com.lims.api.config;
 
-import com.lims.api.filter.AuthCheckFilter;
+import com.lims.api.filter.AuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,7 +15,7 @@ import org.springframework.security.web.header.writers.frameoptions.XFrameOption
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final AuthCheckFilter authCheckFilter;
+    private final AuthorizationFilter authorizationFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -37,6 +37,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
                 .anyRequest().permitAll()
         .and()
-            .addFilterBefore(authCheckFilter, BasicAuthenticationFilter.class);
+            .addFilterBefore(authorizationFilter, BasicAuthenticationFilter.class);
     }
 }

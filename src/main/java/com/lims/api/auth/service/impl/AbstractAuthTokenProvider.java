@@ -13,7 +13,8 @@ import com.lims.api.common.domain.ValidationResult;
 import com.lims.api.exception.domain.UnAuthenticatedException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
-import org.apache.tomcat.util.buf.StringUtils;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
@@ -42,16 +43,20 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
 
     public abstract String generateRefreshToken();
 
+    @Override
     public abstract AuthToken getAuthToken(HttpServletRequest request);
 
     @Override
-    public AuthToken generate(String username, String password) throws UnAuthenticatedException {
-        // TODO validation using user data
-        if (username.equals("ERROR")) {
-            throw new UnAuthenticatedException("error.auth.unauthenticated");
-        }
-
+    public AuthToken generate(String username, String password) {
         try {
+            if (username == null || password == null) {
+                throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "error.auth.notFoundAuthorization");
+            }
+            // TODO validation using user data
+            if (username.equals("ERROR")) {
+                throw new UnAuthenticatedException("error.auth.unauthenticated");
+            }
+
             // TODO input user claims
 
             return AuthJWT.builder()
@@ -59,17 +64,17 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
                     .refreshToken(generateRefreshToken())
                     .build();
 
-        } catch (UnAuthenticatedException e) {
-            log.info("[{}] User Authenticate User", this.getClass());
+        } catch (UnAuthenticatedException | HttpClientErrorException e) {
+            log.info("[{}] Failed to authenticate user", this.getClass());
             throw e;
         } catch (Exception e) {
             e.printStackTrace();
-            return AuthJWT.builder().build();
+            throw e;
         }
     };
 
     @Override
-    public AuthToken refresh(String refreshToken) throws UnAuthenticatedException {
+    public AuthToken refresh(String refreshToken) {
         try {
             ValidationResult validationResult = verify(refreshToken);
             if (refreshToken == null || !validationResult.isVerified()) {
@@ -133,11 +138,11 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
         return JWT.decode(jwt);
     }
 
-    private boolean isBearerToken(String token) {
+    private final boolean isBearerToken(String token) {
         return !Strings.isEmpty(token) && authProperties.type.equals(token.split(" ")[0]);
     }
 
-    private Date dateOf(LocalDateTime localDateTime) {
+    private final Date dateOf(LocalDateTime localDateTime) {
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 

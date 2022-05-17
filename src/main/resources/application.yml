@@ -32,7 +32,6 @@ spring:
       enabled: detect
 
 auth:
-  strategy: header
   jwt:
     secret: ABC123
     access-token:

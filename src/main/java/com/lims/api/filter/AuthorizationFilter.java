@@ -18,7 +18,7 @@ import java.io.IOException;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AuthCheckFilter implements Filter {
+public class AuthorizationFilter implements Filter {
 
     private final String[] allowUrlPatterns = {"/auth/**", "/error", "/error/**"};
     private final AuthTokenProvider authTokenProvider;

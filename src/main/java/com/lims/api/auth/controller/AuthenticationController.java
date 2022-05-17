@@ -7,7 +7,6 @@ import com.lims.api.auth.model.AuthenticationRequest;
 import com.lims.api.auth.model.AuthenticationResponse;
 import com.lims.api.auth.service.AuthTokenProvider;
 import com.lims.api.common.domain.ValidationResult;
-import com.lims.api.exception.domain.UnAuthenticatedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -24,13 +23,13 @@ public class AuthenticationController {
     private final AuthProperties authProperties;
 
     @PostMapping(value = "login")
-    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) throws UnAuthenticatedException {
+    public ResponseEntity<AuthenticationResponse> login(@RequestBody AuthenticationRequest request) {
         AuthToken authToken = authTokenProvider.generate(request.getUsername(), request.getPassword());
         return sendAuthenticationResponse(authToken);
     }
 
     @PostMapping(value = "token")
-    public ResponseEntity<AuthenticationResponse> refreshToken(@UseAuthToken AuthToken token) throws UnAuthenticatedException {
+    public ResponseEntity<AuthenticationResponse> refreshToken(@UseAuthToken AuthToken token) {
         AuthToken authToken = authTokenProvider.refresh(token.getRefreshToken());
         return sendAuthenticationResponse(authToken);
     }

@@ -50,7 +50,10 @@ public class HeaderAuthTokenProvider extends AbstractAuthTokenProvider {
                         .build();
             }
 
-            String tokenType = token.split(" ")[0];
+            String[] bearerTokens = token.split(" ");
+            String tokenType = bearerTokens[0];
+            String jwt = bearerTokens[1];
+
             if (!authProperties.type.equals(tokenType)) {
                 return ValidationResult.builder()
                         .verified(false)
@@ -59,7 +62,7 @@ public class HeaderAuthTokenProvider extends AbstractAuthTokenProvider {
             }
 
             JWTVerifier verifier = createJWTVerifier(authProperties);
-            verifier.verify(token);
+            verifier.verify(jwt);
 
             return ValidationResult.builder().verified(true).build();
 
@@ -76,8 +79,7 @@ public class HeaderAuthTokenProvider extends AbstractAuthTokenProvider {
                     .verified(false)
                     .messageCode("error.auth.default")
                     .build();
-        }
-    }
+        }    }
 
     @Override
     public AuthToken getAuthToken(HttpServletRequest request) {
@@ -88,7 +90,7 @@ public class HeaderAuthTokenProvider extends AbstractAuthTokenProvider {
         String accessToken = request.getHeader(authProperties.authHeaderName);
         String refreshToken = null;
 
-        if (!PatternMatchUtils.simpleMatch(refreshTokenTargetMethods, request.getMethod().toUpperCase())) {
+        if (PatternMatchUtils.simpleMatch(refreshTokenTargetMethods, request.getMethod().toUpperCase())) {
             try {
                 refreshToken = getRefreshTokenAtBody(request);
             } catch (IOException e) {
