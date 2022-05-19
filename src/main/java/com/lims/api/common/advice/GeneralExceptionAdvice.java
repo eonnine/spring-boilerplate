@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
 
 @RestControllerAdvice
-public class AuthControllerAdvice {
+public class GeneralExceptionAdvice {
 
     private final LocaleMessageSource messageSource;
 
-    public AuthControllerAdvice(LocaleMessageSource messageSource) {
+    public GeneralExceptionAdvice(LocaleMessageSource messageSource) {
         this.messageSource = messageSource;
     }
 
