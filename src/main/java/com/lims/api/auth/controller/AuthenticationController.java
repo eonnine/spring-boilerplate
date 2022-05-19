@@ -1,12 +1,12 @@
 package com.lims.api.auth.controller;
 
-import com.lims.api.auth.domain.AuthProperties;
-import com.lims.api.auth.domain.AuthToken;
-import com.lims.api.auth.domain.UseAuthToken;
+import com.lims.api.common.properties.AuthProperties;
+import com.lims.api.auth.dto.AuthToken;
+import com.lims.api.common.annotation.UseAuthToken;
 import com.lims.api.auth.model.AuthenticationRequest;
 import com.lims.api.auth.model.AuthenticationResponse;
 import com.lims.api.auth.service.AuthTokenProvider;
-import com.lims.api.common.domain.ValidationResult;
+import com.lims.api.common.dto.ValidationResult;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

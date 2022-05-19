@@ -1,4 +1,4 @@
-package com.lims.api.auth.domain;
+package com.lims.api.common.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

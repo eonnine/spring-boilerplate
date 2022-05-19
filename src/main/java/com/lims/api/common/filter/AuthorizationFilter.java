@@ -1,9 +1,9 @@
-package com.lims.api.filter;
+package com.lims.api.common.filter;
 
-import com.lims.api.auth.domain.AuthToken;
+import com.lims.api.auth.dto.AuthToken;
 import com.lims.api.auth.service.AuthTokenProvider;
-import com.lims.api.common.domain.ValidationResult;
-import com.lims.api.i18n.service.LocaleMessageSource;
+import com.lims.api.common.dto.ValidationResult;
+import com.lims.api.common.i18n.service.LocaleMessageSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

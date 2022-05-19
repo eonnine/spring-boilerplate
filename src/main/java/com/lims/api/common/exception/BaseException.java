@@ -1,4 +1,4 @@
-package com.lims.api.exception.domain;
+package com.lims.api.common.exception;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

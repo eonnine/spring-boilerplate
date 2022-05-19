@@ -2,9 +2,9 @@ package com.lims.api.auth.service.impl;
 
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.lims.api.auth.domain.AuthProperties;
-import com.lims.api.auth.domain.AuthToken;
-import com.lims.api.common.domain.ValidationResult;
+import com.lims.api.common.properties.AuthProperties;
+import com.lims.api.auth.dto.AuthToken;
+import com.lims.api.common.dto.ValidationResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 

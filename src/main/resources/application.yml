@@ -36,15 +36,15 @@ auth:
     secret: SECRET_KEY
     access-token:
       expire:
-        seconds: 10
-#        minutes: 30
+#        seconds: 10
+        minutes: 30
     refresh-token:
       expire:
-        seconds: 20
-#        hours: 2
+#        seconds: 20
+        hours: 2
 
 logging:
   charset:
     console: UTF-8
   level:
-    com.lims: debug
+    com.lims.api: debug

@@ -1,6 +1,6 @@
 package com.lims.api.auth.service.impl;
 
-import com.lims.api.auth.domain.AuthProperties;
+import com.lims.api.common.properties.AuthProperties;
 import com.lims.api.auth.service.AuthTokenProvider;
 import org.springframework.beans.factory.config.AbstractFactoryBean;
 

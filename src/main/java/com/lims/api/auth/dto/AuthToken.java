@@ -1,4 +1,4 @@
-package com.lims.api.auth.domain;
+package com.lims.api.auth.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

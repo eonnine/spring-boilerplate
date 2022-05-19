@@ -1,4 +1,4 @@
-package com.lims.api.common.domain;
+package com.lims.api.common.dto;
 
 import lombok.Builder;
 import lombok.Getter;

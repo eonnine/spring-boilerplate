@@ -1,6 +1,6 @@
-package com.lims.api.config;
+package com.lims.api.common.config;
 
-import com.lims.api.auth.domain.AuthProperties;
+import com.lims.api.common.properties.AuthProperties;
 import com.lims.api.auth.service.AuthTokenProvider;
 import com.lims.api.auth.service.impl.AuthTokenProviderFactoryBean;
 import lombok.RequiredArgsConstructor;

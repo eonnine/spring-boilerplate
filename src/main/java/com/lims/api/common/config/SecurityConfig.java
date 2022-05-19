@@ -1,6 +1,6 @@
-package com.lims.api.config;
+package com.lims.api.common.config;
 
-import com.lims.api.filter.AuthorizationFilter;
+import com.lims.api.common.filter.AuthorizationFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -14,8 +14,6 @@ import org.springframework.security.web.header.writers.frameoptions.XFrameOption
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    private final AuthorizationFilter authorizationFilter;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -35,8 +33,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .addHeaderWriter(new XFrameOptionsHeaderWriter(XFrameOptionsHeaderWriter.XFrameOptionsMode.DENY))
         .and()
             .authorizeRequests()
-                .anyRequest().permitAll()
-        .and()
-            .addFilterBefore(authorizationFilter, BasicAuthenticationFilter.class);
+                .anyRequest().permitAll();
     }
 }

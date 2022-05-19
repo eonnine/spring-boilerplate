@@ -1,4 +1,4 @@
-package com.lims.api.auth.domain;
+package com.lims.api.common.properties;
 
 import org.apache.tomcat.util.http.SameSiteCookies;
 import org.springframework.boot.context.properties.ConfigurationProperties;

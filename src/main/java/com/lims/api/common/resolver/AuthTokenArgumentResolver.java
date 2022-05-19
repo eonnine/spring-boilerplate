@@ -1,7 +1,7 @@
-package com.lims.api.resolver;
+package com.lims.api.common.resolver;
 
-import com.lims.api.auth.domain.AuthToken;
-import com.lims.api.auth.domain.UseAuthToken;
+import com.lims.api.auth.dto.AuthToken;
+import com.lims.api.common.annotation.UseAuthToken;
 import com.lims.api.auth.service.AuthTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;

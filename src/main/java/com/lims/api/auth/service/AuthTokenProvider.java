@@ -1,7 +1,7 @@
 package com.lims.api.auth.service;
 
-import com.lims.api.auth.domain.AuthToken;
-import com.lims.api.common.domain.ValidationResult;
+import com.lims.api.auth.dto.AuthToken;
+import com.lims.api.common.dto.ValidationResult;
 
 import javax.servlet.http.HttpServletRequest;
 
