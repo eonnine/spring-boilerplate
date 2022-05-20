@@ -33,7 +33,7 @@ public class LoginCheckAspect {
         AuthToken authToken = authTokenProvider.getAuthToken(request);
         String accessToken = authToken.getAccessToken();
 
-        if (Strings.isEmpty(accessToken) || !authTokenProvider.verify(accessToken)) {
+        if (!authTokenProvider.verify(accessToken)) {
             throw new UnAuthenticatedAccessException();
         }
     }
