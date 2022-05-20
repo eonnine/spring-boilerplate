@@ -2,11 +2,12 @@ package com.lims.api.auth.service.impl;
 
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.lims.api.common.properties.AuthProperties;
 import com.lims.api.auth.dto.AuthToken;
 import com.lims.api.common.dto.ValidationResult;
+import com.lims.api.common.properties.AuthProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.http.ResponseCookie;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -24,43 +25,34 @@ public class CookieAuthTokenProvider extends AbstractAuthTokenProvider {
 
     @Override
     public String generateAccessToken() {
-        Date tokenExpiresAt = getExpiresAt(authProperties.jwt.accessToken.expire);
+        Date tokenExpiresAt = getExpiresAt(authProperties.getJwt().getAccessToken().getExpire());
         return this.createToken(tokenExpiresAt);
     }
 
     @Override
     public String generateRefreshToken() {
-        Date tokenExpiresAt = getExpiresAt(authProperties.jwt.refreshToken.expire);
+        Date tokenExpiresAt = getExpiresAt(authProperties.getJwt().getRefreshToken().getExpire());
         return this.createToken(tokenExpiresAt);
     }
 
     @Override
-    public ValidationResult verify(String token) {
+    public ValidationResult verifyResult(String token) {
         try {
             if (Strings.isEmpty(token)) {
-                return ValidationResult.builder()
-                        .verified(false)
-                        .messageCode("error.auth.notFoundAuthorization")
-                        .build();
+                return new ValidationResult(false, "error.auth.notFoundAuthorization");
             }
             JWTVerifier verifier = createJWTVerifier(authProperties);
             verifier.verify(token);
 
-            return ValidationResult.builder().verified(true).build();
+            return new ValidationResult(true);
 
         } catch (JWTVerificationException e) {
             log.info("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
-            return ValidationResult.builder()
-                    .verified(false)
-                    .messageCode("error.auth.invalidToken")
-                    .build();
+            return new ValidationResult(false, "error.auth.invalidToken");
 
         } catch (Exception e){
             e.printStackTrace();
-            return ValidationResult.builder()
-                    .verified(false)
-                    .messageCode("error.auth.default")
-                    .build();
+            return new ValidationResult(false, "error.auth.default");
         }
     }
 
@@ -76,10 +68,10 @@ public class CookieAuthTokenProvider extends AbstractAuthTokenProvider {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if (authProperties.jwt.accessToken.cookie.name.equals(cookie.getName())) {
+                if (authProperties.getJwt().getAccessToken().getCookie().getName().equals(cookie.getName())) {
                     accessToken = cookie.getValue();
                 }
-                else if (authProperties.jwt.refreshToken.cookie.name.equals(cookie.getName())) {
+                else if (authProperties.getJwt().getRefreshToken().getCookie().getName().equals(cookie.getName())) {
                     refreshToken = cookie.getValue();
                 }
             }

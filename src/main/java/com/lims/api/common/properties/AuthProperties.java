@@ -1,18 +1,19 @@
 package com.lims.api.common.properties;
 
+import lombok.Getter;
 import org.apache.tomcat.util.http.SameSiteCookies;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
-import org.springframework.context.annotation.Configuration;
 
+@Getter
 @ConstructorBinding
 @ConfigurationProperties(prefix = "auth")
 public class AuthProperties {
 
-    public final String authHeaderName = "authorization";
-    public final String type;
-    public final Strategy strategy;
-    public final Jwt jwt;
+    private final String authHeaderName = "authorization";
+    private final String type;
+    private final Strategy strategy;
+    private final Jwt jwt;
 
     public AuthProperties(String type, Jwt jwt, Strategy strategy) {
         this.type = type == null ? "Bearer" : type;
@@ -32,29 +33,37 @@ public class AuthProperties {
         }
     }
 
+    @Getter
     public static class Jwt {
-        public final String issuer;
-        public final String secret;
-        public final Boolean secure;
-        public final Boolean httpOnly;
-        public final String sameSite;
-        public final AccessToken accessToken;
-        public final RefreshToken refreshToken;
+        private final String issuer;
+        private final String secret;
+        private final boolean secure;
+        private final boolean httpOnly;
+        private final String sameSite;
+        private final String path;
+        private final AccessToken accessToken;
+        private final RefreshToken refreshToken;
 
-        public Jwt(String issuer, String secret, Boolean secure, Boolean httpOnly, String sameSite, AccessToken accessToken, RefreshToken refreshToken) {
+        public Jwt(String issuer, String secret, Boolean secure, Boolean httpOnly, String sameSite, String path, AccessToken accessToken, RefreshToken refreshToken) {
             this.issuer = issuer == null ? "lims" : issuer;
             this.secret = secret;
             this.secure = secure == null ? false : secure;
             this.httpOnly = httpOnly == null ? true : httpOnly;
             this.sameSite = sameSite == null ? SameSiteCookies.STRICT.getValue() : sameSite;
+            this.path = path == null ? "/" : path;
             this.accessToken = accessToken;
             this.refreshToken = refreshToken;
         }
     }
 
-    public static class AccessToken {
-        public final Expire expire;
-        public final Cookie cookie;
+    public interface AuthTokenProperty {
+        public Expire getExpire();
+        public Cookie getCookie();
+    }
+
+    public static class AccessToken implements AuthTokenProperty {
+        private final Expire expire;
+        private final Cookie cookie;
 
         public AccessToken(Expire expire, Cookie cookie) {
             this.expire = expire;
@@ -66,11 +75,21 @@ public class AuthProperties {
                 this.cookie = new Cookie("access-token", maxAge);
             }
         }
+
+        @Override
+        public Expire getExpire() {
+            return this.expire;
+        }
+
+        @Override
+        public Cookie getCookie() {
+            return this.cookie;
+        }
     }
 
-    public static class RefreshToken {
-        public final Expire expire;
-        public final Cookie cookie;
+    public static class RefreshToken implements AuthTokenProperty {
+        private final Expire expire;
+        private final Cookie cookie;
 
         public RefreshToken(Expire expire, Cookie cookie) {
             this.expire = expire;
@@ -82,15 +101,26 @@ public class AuthProperties {
                 this.cookie = new Cookie("refresh-token", maxAge);
             }
         }
+
+        @Override
+        public Expire getExpire() {
+            return this.expire;
+        }
+
+        @Override
+        public Cookie getCookie() {
+            return this.cookie;
+        }
     }
 
+    @Getter
     public static class Expire {
         private final Long DefaultValue = 0L;
 
-        public final Long days;
-        public final Long hours;
-        public final Long minutes;
-        public final Long seconds;
+        private final Long days;
+        private final Long hours;
+        private final Long minutes;
+        private final Long seconds;
 
         public Expire(Long days, Long hours, Long minutes, Long seconds) {
             this.days = days == null ? DefaultValue : days;
@@ -121,9 +151,10 @@ public class AuthProperties {
         }
     }
 
+    @Getter
     public static class Cookie {
-        public final String name;
-        public final Long maxAge;
+        private final String name;
+        private final Long maxAge;
 
         public Cookie(String name, Long maxAge) {
             this.name = name;

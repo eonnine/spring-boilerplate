@@ -32,9 +32,8 @@ public class LoginCheckAspect {
         HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
         AuthToken authToken = authTokenProvider.getAuthToken(request);
         String accessToken = authToken.getAccessToken();
-        ValidationResult validationResult = authTokenProvider.verify(accessToken);
 
-        if (Strings.isEmpty(accessToken) || !validationResult.isVerified()) {
+        if (Strings.isEmpty(accessToken) || !authTokenProvider.verify(accessToken)) {
             throw new UnAuthenticatedAccessException();
         }
     }

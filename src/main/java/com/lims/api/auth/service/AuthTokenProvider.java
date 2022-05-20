@@ -11,8 +11,9 @@ public interface AuthTokenProvider {
 
     public AuthToken refresh(String refreshToken);
 
-    public ValidationResult verify(String token);
+    public boolean verify(String token);
+
+    public ValidationResult verifyResult(String token);
 
     public AuthToken getAuthToken(HttpServletRequest request);
-
 }

@@ -19,10 +19,10 @@ public class AuthTokenProviderFactoryBean extends AbstractFactoryBean<AuthTokenP
 
     @Override
     protected AuthTokenProvider createInstance() {
-        if (authProperties.strategy.isCookie()) {
+        if (authProperties.getStrategy().isCookie()) {
             return new CookieAuthTokenProvider(authProperties);
         }
-        else if (authProperties.strategy.isHeader()) {
+        else if (authProperties.getStrategy().isHeader()) {
             return new HeaderAuthTokenProvider(authProperties);
         }
 

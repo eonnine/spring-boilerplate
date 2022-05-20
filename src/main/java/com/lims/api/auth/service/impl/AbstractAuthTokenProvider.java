@@ -5,11 +5,11 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.lims.api.common.properties.AuthProperties;
 import com.lims.api.auth.dto.AuthToken;
 import com.lims.api.auth.service.AuthTokenProvider;
 import com.lims.api.common.dto.ValidationResult;
 import com.lims.api.common.exception.UnAuthenticatedException;
+import com.lims.api.common.properties.AuthProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.HttpStatus;
@@ -75,7 +75,7 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
     @Override
     public AuthToken refresh(String refreshToken) {
         try {
-            ValidationResult validationResult = verify(refreshToken);
+            ValidationResult validationResult = verifyResult(refreshToken);
             if (refreshToken == null || !validationResult.isVerified()) {
                 throw new UnAuthenticatedException("error.auth.invalidToken");
             }
@@ -96,33 +96,37 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
         }
     };
 
+    public final boolean verify(String token) {
+        return verifyResult(token).isVerified();
+    }
+
     @Override
-    public ValidationResult verify(String token) {
+    public ValidationResult verifyResult(String token) {
         try {
             if (Strings.isEmpty(token)) {
-                return ValidationResult.builder().verified(false).build();
+                return new ValidationResult(false);
             }
             if (isBearerToken(token)) {
                 token = token.split(" ")[1];
             }
             verifier.verify(token);
 
-            return ValidationResult.builder().verified(true).build();
+            return new ValidationResult(true);
 
         } catch (JWTVerificationException e) {
             log.info("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
-            return ValidationResult.builder().verified(false).build();
+            return new ValidationResult(false);
 
         } catch (Exception e){
             e.printStackTrace();
-            return ValidationResult.builder().verified(false).build();
+            return new ValidationResult(false);
         }
     }
 
     protected String createToken(Date expiresAt) {
         return JWT.create()
                 .withHeader(header)
-                .withIssuer(authProperties.jwt.issuer)
+                .withIssuer(authProperties.getJwt().getIssuer())
                 .withNotBefore(dateOf(LocalDateTime.now()))
                 .withIssuedAt(dateOf(LocalDateTime.now()))
                 .withExpiresAt(expiresAt)
@@ -138,7 +142,7 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
     }
 
     private final boolean isBearerToken(String token) {
-        return !Strings.isEmpty(token) && authProperties.type.equals(token.split(" ")[0]);
+        return !Strings.isEmpty(token) && authProperties.getType().equals(token.split(" ")[0]);
     }
 
     private final Date dateOf(LocalDateTime localDateTime) {
@@ -146,18 +150,18 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
     }
 
     protected final Algorithm createJWTAlgorithm(AuthProperties authProperties) {
-        return algorithm == null ? Algorithm.HMAC256(authProperties.jwt.secret) : algorithm;
+        return algorithm == null ? Algorithm.HMAC256(authProperties.getJwt().getSecret()) : algorithm;
     }
 
     protected final JWTVerifier createJWTVerifier(AuthProperties authProperties) {
-        return verifier == null ? JWT.require(createJWTAlgorithm(authProperties)).withIssuer(authProperties.jwt.issuer).build() : verifier;
+        return verifier == null ? JWT.require(createJWTAlgorithm(authProperties)).withIssuer(authProperties.getJwt().getIssuer()).build() : verifier;
     }
 
     protected final Date getExpiresAt(AuthProperties.Expire expire) {
         return dateOf(LocalDateTime.now()
-                .plusDays(expire.days)
-                .plusHours(expire.hours)
-                .plusMinutes(expire.minutes)
-                .plusSeconds(expire.seconds));
+                .plusDays(expire.getDays())
+                .plusHours(expire.getHours())
+                .plusMinutes(expire.getMinutes())
+                .plusSeconds(expire.getSeconds()));
     }
 }

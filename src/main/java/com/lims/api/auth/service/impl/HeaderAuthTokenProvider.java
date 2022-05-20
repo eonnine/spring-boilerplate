@@ -3,9 +3,9 @@ package com.lims.api.auth.service.impl;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lims.api.common.properties.AuthProperties;
 import com.lims.api.auth.dto.AuthToken;
 import com.lims.api.common.dto.ValidationResult;
+import com.lims.api.common.properties.AuthProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.util.PatternMatchUtils;
@@ -30,55 +30,43 @@ public class HeaderAuthTokenProvider extends AbstractAuthTokenProvider {
 
     @Override
     public String generateAccessToken() {
-        Date tokenExpiresAt = getExpiresAt(authProperties.jwt.accessToken.expire);
-        return authProperties.type + " " + this.createToken(tokenExpiresAt);
+        Date tokenExpiresAt = getExpiresAt(authProperties.getJwt().getAccessToken().getExpire());
+        return authProperties.getType() + " " + this.createToken(tokenExpiresAt);
     }
 
     @Override
     public String generateRefreshToken() {
-        Date tokenExpiresAt = getExpiresAt(authProperties.jwt.refreshToken.expire);
-        return authProperties.type + " " + this.createToken(tokenExpiresAt);
+        Date tokenExpiresAt = getExpiresAt(authProperties.getJwt().getAccessToken().getExpire());
+        return authProperties.getType() + " " + this.createToken(tokenExpiresAt);
     }
 
     @Override
-    public ValidationResult verify(String token) {
+    public ValidationResult verifyResult(String token) {
         try {
             if (Strings.isEmpty(token)) {
-                return ValidationResult.builder()
-                        .verified(false)
-                        .messageCode("error.auth.notFoundAuthorization")
-                        .build();
+                return new ValidationResult(false, "error.auth.notFoundAuthorization");
             }
 
             String[] bearerTokens = token.split(" ");
             String tokenType = bearerTokens[0];
             String jwt = bearerTokens[1];
 
-            if (!authProperties.type.equals(tokenType)) {
-                return ValidationResult.builder()
-                        .verified(false)
-                        .messageCode("error.auth.notDefineTokenType")
-                        .build();
+            if (!authProperties.getType().equals(tokenType)) {
+                return new ValidationResult(false, "error.auth.notDefineTokenType");
             }
 
             JWTVerifier verifier = createJWTVerifier(authProperties);
             verifier.verify(jwt);
 
-            return ValidationResult.builder().verified(true).build();
+            return new ValidationResult(true);
 
         } catch (JWTVerificationException e) {
             log.info("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
-            return ValidationResult.builder()
-                    .verified(false)
-                    .messageCode("error.auth.invalidToken")
-                    .build();
+            return new ValidationResult(false, "error.auth.invalidToken");
 
         } catch (Exception e){
             e.printStackTrace();
-            return ValidationResult.builder()
-                    .verified(false)
-                    .messageCode("error.auth.default")
-                    .build();
+            return new ValidationResult(false, "error.auth.default");
         }    }
 
     @Override
@@ -87,7 +75,7 @@ public class HeaderAuthTokenProvider extends AbstractAuthTokenProvider {
             return AuthToken.builder().build();
         }
 
-        String accessToken = request.getHeader(authProperties.authHeaderName);
+        String accessToken = request.getHeader(authProperties.getAuthHeaderName());
         String refreshToken = null;
 
         if (PatternMatchUtils.simpleMatch(refreshTokenTargetMethods, request.getMethod().toUpperCase())) {
