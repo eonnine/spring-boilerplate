@@ -1,13 +1,8 @@
 package com.lims.api.auth.service.impl;
 
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.lims.api.auth.dto.AuthToken;
-import com.lims.api.common.dto.ValidationResult;
 import com.lims.api.common.properties.AuthProperties;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.http.ResponseCookie;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -33,27 +28,6 @@ public class CookieAuthTokenProvider extends AbstractAuthTokenProvider {
     public String generateRefreshToken() {
         Date tokenExpiresAt = getExpiresAt(authProperties.getJwt().getRefreshToken().getExpire());
         return this.createToken(tokenExpiresAt);
-    }
-
-    @Override
-    public ValidationResult verifyResult(String token) {
-        try {
-            if (Strings.isEmpty(token)) {
-                return new ValidationResult(false, "error.auth.notFoundAuthorization");
-            }
-            JWTVerifier verifier = createJWTVerifier(authProperties);
-            verifier.verify(token);
-
-            return new ValidationResult(true);
-
-        } catch (JWTVerificationException e) {
-            log.info("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
-            return new ValidationResult(false, "error.auth.invalidToken");
-
-        } catch (Exception e){
-            e.printStackTrace();
-            return new ValidationResult(false, "error.auth.default");
-        }
     }
 
     @Override

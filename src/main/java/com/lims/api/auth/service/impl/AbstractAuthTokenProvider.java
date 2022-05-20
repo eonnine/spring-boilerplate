@@ -104,22 +104,20 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
     public ValidationResult verifyResult(String token) {
         try {
             if (Strings.isEmpty(token)) {
-                return new ValidationResult(false);
+                return new ValidationResult(false, "error.auth.notFoundAuthorization");
             }
-            if (isBearerToken(token)) {
-                token = token.split(" ")[1];
-            }
+
             verifier.verify(token);
 
             return new ValidationResult(true);
 
         } catch (JWTVerificationException e) {
             log.info("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
-            return new ValidationResult(false);
+            return new ValidationResult(false, "error.auth.invalidToken");
 
         } catch (Exception e){
             e.printStackTrace();
-            return new ValidationResult(false);
+            return new ValidationResult(false, "error.auth.default");
         }
     }
 
@@ -137,12 +135,7 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
         if (token == null) {
             return null;
         }
-        String jwt = isBearerToken(token) ? token.split(" ")[1] : token;
-        return JWT.decode(jwt);
-    }
-
-    private final boolean isBearerToken(String token) {
-        return !Strings.isEmpty(token) && authProperties.getType().equals(token.split(" ")[0]);
+        return JWT.decode(token);
     }
 
     private final Date dateOf(LocalDateTime localDateTime) {
