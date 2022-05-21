@@ -6,6 +6,7 @@ import com.lims.api.auth.service.AuthTokenProvider;
 import com.lims.api.common.annotation.LoginCheck;
 import com.lims.api.common.dto.ValidationResult;
 import com.lims.api.common.exception.UnAuthenticatedAccessException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -17,6 +18,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
+@Slf4j
 @Aspect
 @Component
 public class LoginCheckAspect {
@@ -34,6 +36,7 @@ public class LoginCheckAspect {
         String accessToken = authToken.getAccessToken();
 
         if (!authTokenProvider.verify(accessToken)) {
+            log.warn("[{}] Unauthorized Access. token: {}", this.getClass(), accessToken);
             throw new UnAuthenticatedAccessException();
         }
     }

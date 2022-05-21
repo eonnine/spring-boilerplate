@@ -1,5 +1,6 @@
 package com.lims.api.common.advice;
 
+import com.lims.api.common.exception.UnAuthenticatedAccessException;
 import com.lims.api.common.exception.UnAuthenticatedException;
 import com.lims.api.common.model.ErrorResponse;
 import com.lims.api.common.i18n.service.LocaleMessageSource;
@@ -20,6 +21,11 @@ public class GeneralExceptionAdvice {
 
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> unAuthenticatedExceptionHandler(UnAuthenticatedException e) {
+        return new ResponseEntity<>(new ErrorResponse(messageSource.getMessage(e.getMessageCode())), e.getStatus());
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> unAuthenticatedExceptionHandler(UnAuthenticatedAccessException e) {
         return new ResponseEntity<>(new ErrorResponse(messageSource.getMessage(e.getMessageCode())), e.getStatus());
     }
 
