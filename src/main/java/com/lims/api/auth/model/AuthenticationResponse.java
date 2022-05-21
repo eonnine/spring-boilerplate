@@ -53,7 +53,7 @@ public class AuthenticationResponse {
                 .build();
     }
 
-    public ResponseCookie makeResponseCookie(AuthProperties authProperties, AuthProperties.AuthTokenProperty authTokenProperty, String token) {
+    public ResponseCookie makeResponseCookie(AuthProperties authProperties, AuthProperties.AuthToken authTokenProperty, String token) {
         return ResponseCookie
                 .from(authTokenProperty.getCookie().getName(), token)
                 .maxAge(authTokenProperty.getCookie().getMaxAge())

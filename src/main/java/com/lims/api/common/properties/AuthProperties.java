@@ -56,12 +56,12 @@ public class AuthProperties {
         }
     }
 
-    public interface AuthTokenProperty {
+    public interface AuthToken {
         public Expire getExpire();
         public Cookie getCookie();
     }
 
-    public static class AccessToken implements AuthTokenProperty {
+    public static class AccessToken implements AuthToken {
         private final Expire expire;
         private final Cookie cookie;
 
@@ -87,7 +87,7 @@ public class AuthProperties {
         }
     }
 
-    public static class RefreshToken implements AuthTokenProperty {
+    public static class RefreshToken implements AuthToken {
         private final Expire expire;
         private final Cookie cookie;
 
