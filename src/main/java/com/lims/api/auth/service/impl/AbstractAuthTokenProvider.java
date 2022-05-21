@@ -46,7 +46,7 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
     public abstract AuthToken getAuthToken(HttpServletRequest request);
 
     @Override
-    public AuthToken generate(String username, String password) {
+    public AuthToken generate(String username, String password) throws UnAuthenticatedException {
         try {
             if (username == null || password == null) {
                 throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "error.auth.notFoundAuthorization");
@@ -73,7 +73,7 @@ public abstract class AbstractAuthTokenProvider implements AuthTokenProvider {
     };
 
     @Override
-    public AuthToken refresh(String refreshToken) {
+    public AuthToken refresh(String refreshToken) throws UnAuthenticatedException {
         try {
             ValidationResult validationResult = verifyResult(refreshToken);
             if (refreshToken == null || !validationResult.isVerified()) {
