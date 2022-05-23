@@ -1,6 +1,7 @@
 package com.lims.api.common.properties;
 
 import lombok.Getter;
+import org.apache.tomcat.util.codec.binary.StringUtils;
 import org.apache.tomcat.util.http.SameSiteCookies;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
@@ -15,21 +16,26 @@ public class AuthProperties {
     private final Strategy strategy;
     private final Jwt jwt;
 
-    public AuthProperties(String type, Jwt jwt, Strategy strategy) {
-        this.type = type == null ? "Bearer" : type;
-        this.strategy = strategy == null ? Strategy.cookie : strategy;
+    public AuthProperties(Jwt jwt, Strategy strategy) {
+        if (strategy == null) {
+            this.strategy = Strategy.COOKIE;
+            this.type = null;
+        } else {
+            this.strategy = strategy;
+            this.type = Strategy.COOKIE.name().equals(strategy.name().toUpperCase()) ? null : "Bearer";
+        }
         this.jwt = jwt;
     }
 
     public enum Strategy {
-        header,
-        cookie;
+        HEADER,
+        COOKIE;
 
         public boolean isHeader() {
-            return this.name() == Strategy.header.name();
+            return this.name() == Strategy.HEADER.name();
         }
         public boolean isCookie() {
-            return this.name() == Strategy.cookie.name();
+            return this.name() == Strategy.COOKIE.name();
         }
     }
 
@@ -91,7 +97,7 @@ public class AuthProperties {
         private final Expire expire;
         private final Cookie cookie;
 
-        public RefreshToken(Expire expire, Cookie cookie) {
+        public RefreshToken(String paramName, Expire expire, Cookie cookie) {
             this.expire = expire;
             Long maxAge = expire == null ? 0L : expire.getMaxAge();
 

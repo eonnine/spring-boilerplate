@@ -5,15 +5,15 @@ import org.springframework.http.HttpStatus;
 public class UnAuthenticatedAccessException extends BaseException {
 
     public UnAuthenticatedAccessException() {
-        super(HttpStatus.FORBIDDEN, "error.auth.unauthorizedAccess");
+        this(HttpStatus.FORBIDDEN);
     }
 
     public UnAuthenticatedAccessException(HttpStatus status) {
-        super(status, "error.auth.unauthorizedAccess");
+        this(status, "error.auth.unauthorizedAccess");
     }
 
     public UnAuthenticatedAccessException(String messageCode) {
-        super(HttpStatus.FORBIDDEN, messageCode);
+        this(HttpStatus.FORBIDDEN, messageCode);
     }
 
     public UnAuthenticatedAccessException(HttpStatus status, String messageCode) {

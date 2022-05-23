@@ -5,11 +5,11 @@ import org.springframework.http.HttpStatus;
 public class UnAuthenticatedException extends BaseException {
 
     public UnAuthenticatedException() {
-        super(HttpStatus.UNAUTHORIZED, "error.auth.unauthenticated");
+        this(HttpStatus.UNAUTHORIZED);
     }
 
     public UnAuthenticatedException(HttpStatus status) {
-        super(status, "error.auth.unauthenticated");
+        this(status, "error.auth.unauthenticated");
     }
 
     public UnAuthenticatedException(String messageCode) {
