@@ -42,7 +42,7 @@ public class JWTProvider implements TokenProvider {
 
     @Override
     public String createToken(Date expiresAt) {
-        return getType() +
+        return tokenPrefix() +
                 JWT.create()
                         .withHeader(header)
                         .withIssuer(authProperties.getJwt().getIssuer())
@@ -76,7 +76,7 @@ public class JWTProvider implements TokenProvider {
         }
     }
 
-    private String getType() {
+    private String tokenPrefix() {
         return Strings.isEmpty(authProperties.getType()) ? "" : authProperties.getType() + " ";
     }
 
