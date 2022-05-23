@@ -27,7 +27,7 @@ public class LoginCheckAspect {
     @Before("@annotation(com.lims.api.common.annotation.LoginCheck) && @annotation(loginCheck)")
     public void loginCheck(JoinPoint jp, LoginCheck loginCheck) throws Throwable {
         HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
-        AuthToken authToken = tokenAuthenticationProvider.getAuthentication(request);
+        AuthToken authToken = tokenAuthenticationProvider.getAuthToken(request);
         String accessToken = authToken.getAccessToken();
 
         if (!tokenAuthenticationProvider.verify(accessToken)) {

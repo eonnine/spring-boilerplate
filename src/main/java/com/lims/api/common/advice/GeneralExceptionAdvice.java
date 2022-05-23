@@ -2,9 +2,8 @@ package com.lims.api.common.advice;
 
 import com.lims.api.common.exception.UnAuthenticatedAccessException;
 import com.lims.api.common.exception.UnAuthenticatedException;
-import com.lims.api.common.model.ErrorResponse;
 import com.lims.api.common.i18n.service.LocaleMessageSource;
-import lombok.RequiredArgsConstructor;
+import com.lims.api.common.model.ErrorResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;

@@ -1,14 +1,10 @@
 package com.lims.api.auth.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lims.api.auth.dto.AuthToken;
-import com.lims.api.auth.model.TokenResponse;
 import com.lims.api.auth.service.TokenProvider;
 import com.lims.api.common.dto.ValidationResult;
 import com.lims.api.common.properties.AuthProperties;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.util.PatternMatchUtils;
 
 import javax.servlet.http.HttpServletRequest;

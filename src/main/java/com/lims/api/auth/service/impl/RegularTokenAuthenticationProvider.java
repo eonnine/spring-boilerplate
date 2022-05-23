@@ -7,9 +7,7 @@ import com.lims.api.common.dto.ValidationResult;
 import com.lims.api.common.exception.UnAuthenticatedException;
 import com.lims.api.common.properties.AuthProperties;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +27,7 @@ public abstract class RegularTokenAuthenticationProvider implements TokenAuthent
     }
 
     @Override
-    public AuthToken authenticate(String username, String password) throws UnAuthenticatedException {
+    public final AuthToken authenticate(String username, String password) throws UnAuthenticatedException {
         try {
             if (username == null || password == null) {
                 throw new HttpClientErrorException(HttpStatus.BAD_REQUEST, "error.auth.notFoundAuthorization");
@@ -51,7 +49,7 @@ public abstract class RegularTokenAuthenticationProvider implements TokenAuthent
     }
 
     @Override
-    public AuthToken renewAuthenticate(String token) throws UnAuthenticatedException {
+    public final AuthToken renewAuthenticate(String token) throws UnAuthenticatedException {
         try {
             if (token == null || !verify(token)) {
                 throw new UnAuthenticatedException("error.auth.invalidToken");
@@ -67,7 +65,7 @@ public abstract class RegularTokenAuthenticationProvider implements TokenAuthent
     }
 
     @Override
-    public boolean verify(String token) {
+    public final boolean verify(String token) {
         return verifyResult(token).isResult();
     }
 
@@ -87,7 +85,7 @@ public abstract class RegularTokenAuthenticationProvider implements TokenAuthent
     }
 
     @Override
-    public AuthToken getAuthentication(HttpServletRequest request) {
+    public final AuthToken getAuthToken(HttpServletRequest request) {
         return AuthToken.builder()
                 .accessToken(getAccessToken(request))
                 .refreshToken(getRefreshToken(request))

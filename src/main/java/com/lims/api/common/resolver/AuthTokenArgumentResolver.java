@@ -26,6 +26,6 @@ public class AuthTokenArgumentResolver implements HandlerMethodArgumentResolver 
 
     @Override
     public AuthToken resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-        return tokenAuthenticationProvider.getAuthentication(webRequest.getNativeRequest(HttpServletRequest.class));
+        return tokenAuthenticationProvider.getAuthToken(webRequest.getNativeRequest(HttpServletRequest.class));
     }
 }

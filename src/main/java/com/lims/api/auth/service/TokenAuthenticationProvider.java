@@ -3,8 +3,6 @@ package com.lims.api.auth.service;
 import com.lims.api.auth.dto.AuthToken;
 import com.lims.api.common.dto.ValidationResult;
 import com.lims.api.common.exception.UnAuthenticatedException;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,6 +16,6 @@ public interface TokenAuthenticationProvider {
 
     public ValidationResult verifyResult(String token);
 
-    public AuthToken getAuthentication(HttpServletRequest request);
+    public AuthToken getAuthToken(HttpServletRequest request);
 
 }
