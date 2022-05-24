@@ -1,10 +1,13 @@
 package com.lims.api.auth.model;
 
 import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotBlank;
+import java.util.List;
 
 @Getter
+@Setter
 public class AuthenticationRequest {
 
     @NotBlank
@@ -12,6 +15,14 @@ public class AuthenticationRequest {
 
     @NotBlank
     private String password;
+
+    private Integer num;
+
+    private AuthenticationRequest child;
+
+    private List<String> list;
+
+    private boolean veri;
 
     @Override
     public String toString() {

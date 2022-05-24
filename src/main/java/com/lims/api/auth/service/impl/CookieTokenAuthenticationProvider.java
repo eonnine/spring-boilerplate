@@ -36,14 +36,4 @@ public class CookieTokenAuthenticationProvider extends RegularTokenAuthenticatio
                 .orElse(null);
     }
 
-    private ResponseCookie makeResponseCookie(AuthProperties.AuthToken authTokenProperty, String token) {
-        return ResponseCookie
-                .from(authTokenProperty.getCookie().getName(), token)
-                .maxAge(authTokenProperty.getCookie().getMaxAge())
-                .secure(authProperties.getJwt().isSecure())
-                .sameSite(authProperties.getJwt().getSameSite())
-                .httpOnly(authProperties.getJwt().isHttpOnly())
-                .path(authProperties.getJwt().getPath())
-                .build();
-    }
 }
