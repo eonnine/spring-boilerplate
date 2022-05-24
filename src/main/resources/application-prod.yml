@@ -1,0 +1,49 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+    encoding:
+      charset: UTF-8
+      force: true
+  shutdown: graceful
+  forward-headers-strategy: native
+  error:
+    include-message: always
+    include-stacktrace: never
+    include-binding-errors: never
+    include-exception: false
+    whitelabel:
+      enabled: false
+
+
+spring:
+  devtools:
+    livereload:
+      enabled: true
+  datasource:
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    url: jdbc:oracle:thin:@203.229.218.221:22221:iit
+    username: SL_USER
+    password: SLUSER
+  messages:
+    encoding: UTF-8
+  output:
+    ansi:
+      enabled: detect
+
+auth:
+  strategy: cookie
+  jwt:
+    secret: SECRET_KEY
+    access-token:
+      expire:
+        minutes: 30
+    refresh-token:
+      expire:
+        hours: 2
+
+logging:
+  charset:
+    console: UTF-8
+  level:
+    com.lims.api: debug

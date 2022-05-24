@@ -1,0 +1,10 @@
+auth:
+  strategy: header
+  jwt:
+    secret: SECRET_KEY
+    access-token:
+      expire:
+        minutes: 30
+    refresh-token:
+      expire:
+        hours: 2

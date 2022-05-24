@@ -24,7 +24,7 @@ public class AuthProperties {
             this.strategy = strategy;
             this.type = Strategy.COOKIE.name().equals(strategy.name().toUpperCase()) ? null : "Bearer";
         }
-        this.jwt = jwt;
+        this.jwt = jwt == null ? new Jwt(null, null, true, true, null, null, null, null) : jwt;
     }
 
     public enum Strategy {
@@ -52,13 +52,13 @@ public class AuthProperties {
 
         public Jwt(String issuer, String secret, Boolean secure, Boolean httpOnly, String sameSite, String path, AccessToken accessToken, RefreshToken refreshToken) {
             this.issuer = issuer == null ? "lims" : issuer;
-            this.secret = secret;
+            this.secret = secret == null ? "secret" : secret;
             this.secure = secure == null ? false : secure;
             this.httpOnly = httpOnly == null ? true : httpOnly;
             this.sameSite = sameSite == null ? SameSiteCookies.STRICT.getValue() : sameSite;
             this.path = path == null ? "/" : path;
-            this.accessToken = accessToken;
-            this.refreshToken = refreshToken;
+            this.accessToken = accessToken == null ? new AccessToken(null, null) : accessToken;
+            this.refreshToken = refreshToken == null ? new RefreshToken(null, null) : refreshToken;
         }
     }
 
@@ -72,7 +72,7 @@ public class AuthProperties {
         private final Cookie cookie;
 
         public AccessToken(Expire expire, Cookie cookie) {
-            this.expire = expire;
+            this.expire = expire == null ? new Expire(null, null, 30L, null) : expire;
             Long maxAge = expire == null ? 0L : expire.getMaxAge();
 
             if (cookie != null && cookie.name != null) {
@@ -97,8 +97,8 @@ public class AuthProperties {
         private final Expire expire;
         private final Cookie cookie;
 
-        public RefreshToken(String paramName, Expire expire, Cookie cookie) {
-            this.expire = expire;
+        public RefreshToken(Expire expire, Cookie cookie) {
+            this.expire = expire == null ? new Expire(null, 2L, null, null) : expire;
             Long maxAge = expire == null ? 0L : expire.getMaxAge();
 
             if (cookie != null && cookie.name != null) {

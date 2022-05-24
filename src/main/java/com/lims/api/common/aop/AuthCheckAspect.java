@@ -3,7 +3,7 @@ package com.lims.api.common.aop;
 
 import com.lims.api.auth.dto.AuthToken;
 import com.lims.api.auth.service.TokenAuthenticationProvider;
-import com.lims.api.common.annotation.LoginCheck;
+import com.lims.api.common.annotation.Authed;
 import com.lims.api.common.exception.UnAuthenticatedAccessException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,12 +20,12 @@ import javax.servlet.http.HttpServletRequest;
 @Aspect
 @Component
 @RequiredArgsConstructor
-public class LoginCheckAspect {
+public class AuthCheckAspect {
 
     private final TokenAuthenticationProvider authenticationProvider;
 
-    @Before("@annotation(com.lims.api.common.annotation.LoginCheck) && @annotation(loginCheck)")
-    public void loginCheck(JoinPoint jp, LoginCheck loginCheck) throws UnAuthenticatedAccessException {
+    @Before("@annotation(com.lims.api.common.annotation.Authed)")
+    public void AuthCheck(JoinPoint jp) throws UnAuthenticatedAccessException {
         HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
         AuthToken authToken = authenticationProvider.getAuthToken(request);
         String accessToken = authToken.getAccessToken();

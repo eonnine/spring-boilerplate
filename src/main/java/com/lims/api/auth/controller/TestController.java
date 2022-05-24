@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("test")
 public class TestController {
 
-//    @LoginCheck
     @GetMapping
     public String test(@UseAuthToken AuthToken token, String id) {
         return id;
