@@ -13,4 +13,11 @@ public class AuthenticationRequest {
     @NotBlank
     private String password;
 
+    @Override
+    public String toString() {
+        return "AuthenticationRequest{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                '}';
+    }
 }

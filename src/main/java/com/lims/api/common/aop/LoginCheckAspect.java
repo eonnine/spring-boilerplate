@@ -22,15 +22,16 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class LoginCheckAspect {
 
-    private final TokenAuthenticationProvider tokenAuthenticationProvider;
+    private final TokenAuthenticationProvider authenticationProvider;
 
     @Before("@annotation(com.lims.api.common.annotation.LoginCheck) && @annotation(loginCheck)")
-    public void loginCheck(JoinPoint jp, LoginCheck loginCheck) throws Throwable {
+    public void loginCheck(JoinPoint jp, LoginCheck loginCheck) throws UnAuthenticatedAccessException {
         HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
-        AuthToken authToken = tokenAuthenticationProvider.getAuthToken(request);
+        AuthToken authToken = authenticationProvider.getAuthToken(request);
         String accessToken = authToken.getAccessToken();
 
-        if (!tokenAuthenticationProvider.verify(accessToken)) {
+        if (!authenticationProvider.verify(accessToken)) {
+            // TODO change token to user_id in logging
             log.warn("[{}] Unauthorized Access. token: {}", this.getClass(), accessToken);
             throw new UnAuthenticatedAccessException();
         }

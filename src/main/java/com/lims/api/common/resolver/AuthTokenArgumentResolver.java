@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class AuthTokenArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final TokenAuthenticationProvider tokenAuthenticationProvider;
+    private final TokenAuthenticationProvider authenticationProvider;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -26,6 +26,6 @@ public class AuthTokenArgumentResolver implements HandlerMethodArgumentResolver 
 
     @Override
     public AuthToken resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-        return tokenAuthenticationProvider.getAuthToken(webRequest.getNativeRequest(HttpServletRequest.class));
+        return authenticationProvider.getAuthToken(webRequest.getNativeRequest(HttpServletRequest.class));
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseCookie;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class CookieTokenAuthenticationProvider extends RegularTokenAuthenticationProvider {
 
@@ -27,13 +28,12 @@ public class CookieTokenAuthenticationProvider extends RegularTokenAuthenticatio
         return findTokenInCookies(request.getCookies(), authProperties.getJwt().getRefreshToken().getCookie().getName());
     }
 
-    @SuppressWarnings("ConstantConditions")
     private String findTokenInCookies(Cookie[] cookies, String cookieName) {
-        return Arrays.stream(cookies)
+        return Arrays.stream(Optional.ofNullable(cookies).orElseGet(() -> new Cookie[0]))
                 .filter(cookie -> cookieName.equals(cookie.getName()))
                 .map(Cookie::getValue)
                 .findAny()
-                .orElseGet(() -> null);
+                .orElse(null);
     }
 
     private ResponseCookie makeResponseCookie(AuthProperties.AuthToken authTokenProperty, String token) {
