@@ -5,10 +5,10 @@ import com.lims.api.auth.dto.AuthToken;
 import com.lims.api.auth.service.TokenAuthenticationService;
 import com.lims.api.auth.service.TokenService;
 import com.lims.api.common.exception.UnAuthenticatedException;
-import com.lims.api.common.properties.auth.AccessTokenProperties;
-import com.lims.api.common.properties.auth.RefreshTokenProperties;
+import com.lims.api.common.properties.auth.AuthProperties;
+import com.lims.api.common.properties.auth.TokenProperties;
 import com.lims.api.common.properties.auth.domain.ExpireProperty;
-import lombok.RequiredArgsConstructor;
+import com.lims.api.common.properties.auth.domain.TokenProperty;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
@@ -19,12 +19,17 @@ import java.time.ZoneId;
 import java.util.Date;
 
 @Log4j2
-@RequiredArgsConstructor
 public abstract class RegularTokenAuthenticationService implements TokenAuthenticationService {
 
-    private final AccessTokenProperties accessTokenProperties;
-    private final RefreshTokenProperties refreshTokenProperties;
+    private final TokenProperty accessTokenProperties;
+    private final TokenProperty refreshTokenProperties;
     private final TokenService tokenService;
+
+    public RegularTokenAuthenticationService(TokenProperties tokenProperties, TokenService tokenService) {
+        this.accessTokenProperties = tokenProperties.getAccessToken();
+        this.refreshTokenProperties = tokenProperties.getRefreshToken();
+        this.tokenService = tokenService;
+    }
 
     @Override
     public AuthToken authenticate(String username, String password) {
@@ -50,7 +55,7 @@ public abstract class RegularTokenAuthenticationService implements TokenAuthenti
     }
 
     @Override
-    public AuthToken authentication(Token token) {
+    public AuthToken authenticate(Token token) {
         try {
             if (token == null || !tokenService.verify(token)) {
                 throw new UnAuthenticatedException("error.auth.invalidToken");
@@ -62,7 +67,7 @@ public abstract class RegularTokenAuthenticationService implements TokenAuthenti
         } catch(Exception e) {
             e.printStackTrace();
             log.error("[{}] Throw Exception during authentication. {}", this.getClass(), e.getMessage());
-            return AuthToken.builder().build();
+            throw e;
         }
     }
 

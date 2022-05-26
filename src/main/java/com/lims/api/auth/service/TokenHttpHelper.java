@@ -6,6 +6,6 @@ import org.springframework.http.ResponseEntity;
 
 public interface TokenHttpHelper {
 
-    public ResponseEntity toTokenResponseEntity(HttpStatus status, AuthToken authToken);
+    ResponseEntity toResponseEntity(HttpStatus status, AuthToken authToken);
 
 }

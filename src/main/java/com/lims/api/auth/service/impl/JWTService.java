@@ -12,20 +12,23 @@ import com.lims.api.common.i18n.service.LocaleMessageSource;
 import com.lims.api.common.properties.auth.TokenProperties;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 
 @Log4j2
+@Service
 public class JWTService implements TokenService {
 
     private final LocaleMessageSource messageSource;
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
     private final String issuer;
-    private final String tokenPrefix;
+    private final String prefix;
     private final Map<String, Object> header = Map.of(
             "alg", "HS256",
             "typ", "JWT"
@@ -39,13 +42,12 @@ public class JWTService implements TokenService {
         this.algorithm = algorithm;
         this.verifier = JWT.require(algorithm).withIssuer(issuer).build();
         this.issuer = tokenProperties.getIssuer();
-        this.tokenPrefix = tokenProperties.getType();
+        this.prefix = tokenProperties.getPrefix();
     }
 
     @Override
     public final Token createToken(Date expiresAt) {
-        return new Token(
-                tokenPrefix +
+        String token = addPrefix(
                 JWT.create()
                 .withHeader(header)
                 .withIssuer(issuer)
@@ -54,6 +56,7 @@ public class JWTService implements TokenService {
                 .withExpiresAt(expiresAt)
                 .sign(algorithm)
         );
+        return new Token(token);
     }
 
     @Override
@@ -64,11 +67,14 @@ public class JWTService implements TokenService {
     @Override
     public ValidationResult verifyResult(Token token) {
         try {
-            String jwt = token.getToken();
+            String jwt = token.get();
+
             if (Strings.isEmpty(jwt)) {
                 throw new UnAuthenticatedException("error.auth.notFoundAuthorization");
             }
-            verifier.verify(jwt);
+
+            verifier.verify(removePrefix(jwt));
+
             return new ValidationResult(true);
 
         } catch(JWTVerificationException e) {
@@ -84,6 +90,16 @@ public class JWTService implements TokenService {
             log.error("[{}] Throw Exception during verify authentication. {}", this.getClass(), e.getMessage());
             return new ValidationResult(false, messageSource.getMessage("error.auth.invalidToken"));
         }
+    }
+
+    private String addPrefix(String value) {
+        return prefix + value;
+    }
+
+    private String removePrefix(String value) {
+        return Optional.ofNullable(value)
+                .map(s -> s.split(prefix)[1])
+                .orElse(value);
     }
 
     private Date nowDate() {

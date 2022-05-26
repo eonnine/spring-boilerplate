@@ -10,7 +10,7 @@ public interface TokenAuthenticationService {
 
     AuthToken authenticate(String username, String password) throws UnAuthenticatedException;
 
-    AuthToken authentication(Token token) throws UnAuthenticatedException;
+    AuthToken authenticate(Token token) throws UnAuthenticatedException;
 
     AuthToken getAuthToken(HttpServletRequest request);
 

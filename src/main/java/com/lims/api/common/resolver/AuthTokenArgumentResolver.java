@@ -1,7 +1,7 @@
 package com.lims.api.common.resolver;
 
 import com.lims.api.auth.dto.AuthToken;
-import com.lims.api.auth.service.TokenAuthenticationProvider;
+import com.lims.api.auth.service.TokenAuthenticationService;
 import com.lims.api.common.annotation.UseAuthToken;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.MethodParameter;
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class AuthTokenArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final TokenAuthenticationProvider authenticationProvider;
+    private final TokenAuthenticationService authenticationService;
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -26,6 +26,6 @@ public class AuthTokenArgumentResolver implements HandlerMethodArgumentResolver 
 
     @Override
     public AuthToken resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-        return authenticationProvider.getAuthToken(webRequest.getNativeRequest(HttpServletRequest.class));
+        return authenticationService.getAuthToken(webRequest.getNativeRequest(HttpServletRequest.class));
     }
 }

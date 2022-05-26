@@ -2,14 +2,14 @@ package com.lims.api.auth.domain;
 
 public class Token {
 
-    private final String token;
+    private final String value;
 
     public Token(String token) {
-        this.token = token;
+        this.value = token;
     }
 
-    public String getToken() {
-        return token;
+    public String get() {
+        return value;
     }
 
 }

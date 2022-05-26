@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.http.ResponseEntity;
 
 @Getter
 @Builder
@@ -16,8 +17,8 @@ public class TokenResponse {
 
     public TokenResponse toResponse(AuthToken authToken) {
         return TokenResponse.builder()
-                .accessToken(authToken.getAccessToken())
-                .refreshToken(authToken.getRefreshToken())
+                .accessToken(authToken.getAccessToken().get())
+                .refreshToken(authToken.getRefreshToken().get())
                 .build();
     }
 }

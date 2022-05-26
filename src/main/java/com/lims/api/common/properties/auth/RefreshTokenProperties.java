@@ -8,7 +8,7 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 @ConstructorBinding
 @ConfigurationProperties(prefix = "auth.token.refresh-token")
 public class RefreshTokenProperties extends TokenProperty {
-    private final String name = "access-token";
+    private final String name = "refresh-token";
 
     public RefreshTokenProperties(ExpireProperty expire) {
         super(expire);
@@ -20,7 +20,7 @@ public class RefreshTokenProperties extends TokenProperty {
     }
 
     @Override
-    protected AccessTokenExpireProperties getDefaultExpire() {
-        return new AccessTokenExpireProperties(null, 2L, null, null);
+    protected RefreshTokenExpireProperties getDefaultExpire() {
+        return new RefreshTokenExpireProperties(null, 2L, null, null);
     }
 }
