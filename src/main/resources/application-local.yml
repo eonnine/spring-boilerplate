@@ -15,7 +15,6 @@ server:
     whitelabel:
       enabled: false
 
-
 spring:
   devtools:
     livereload:
@@ -30,7 +29,6 @@ spring:
   output:
     ansi:
       enabled: detect
-
 
 logging:
   charset:

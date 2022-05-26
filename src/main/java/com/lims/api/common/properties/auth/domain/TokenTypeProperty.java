@@ -1,7 +1,7 @@
 package com.lims.api.common.properties.auth.domain;
 
 public enum TokenTypeProperty {
-    COOKIE(""),
+    COOKIE(null),
     BEARER("Bearer");
 
     private String prefix;

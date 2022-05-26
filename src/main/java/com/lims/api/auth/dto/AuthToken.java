@@ -1,19 +1,12 @@
 package com.lims.api.auth.dto;
 
+import com.lims.api.auth.domain.Token;
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter
 @Builder
 public class AuthToken {
-    private final String accessToken;
-    private final String refreshToken;
-
-    @Override
-    public String toString() {
-        return "AuthToken{" +
-                "accessToken='" + accessToken + '\'' +
-                ", refreshToken='" + refreshToken + '\'' +
-                '}';
-    }
+    private final Token accessToken;
+    private final Token refreshToken;
 }

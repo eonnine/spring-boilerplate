@@ -15,7 +15,6 @@ server:
     whitelabel:
       enabled: false
 
-
 spring:
   devtools:
     livereload:
@@ -30,17 +29,6 @@ spring:
   output:
     ansi:
       enabled: detect
-
-auth:
-  strategy: cookie
-  jwt:
-    secret: SECRET_KEY
-    access-token:
-      expire:
-        minutes: 30
-    refresh-token:
-      expire:
-        hours: 2
 
 logging:
   charset:

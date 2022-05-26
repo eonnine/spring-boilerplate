@@ -4,15 +4,15 @@ import lombok.Getter;
 
 @Getter
 public class ValidationResult {
-    private boolean result;
+    private boolean verified;
     private String message;
 
     public ValidationResult(boolean verified) {
-        this.result = verified;
+        this.verified = verified;
     }
 
     public ValidationResult(boolean verified, String message) {
-        this.result = verified;
+        this.verified = verified;
         this.message = message;
     }
 }

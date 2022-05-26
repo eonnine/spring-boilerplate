@@ -1,5 +1,8 @@
 package com.lims.api.common.properties.auth.domain;
 
+import lombok.Getter;
+
+@Getter
 public class ExpireProperty {
     private final Long DefaultValue = 0L;
 

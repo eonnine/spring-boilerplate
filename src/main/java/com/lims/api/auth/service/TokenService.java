@@ -1,13 +1,16 @@
 package com.lims.api.auth.service;
 
+import com.lims.api.auth.domain.Token;
 import com.lims.api.common.dto.ValidationResult;
 
 import java.util.Date;
 
 public interface TokenService {
 
-    public String createToken(Date expiresAt);
+    Token createToken(Date expiresAt);
 
-    public ValidationResult verifyToken(String token);
+    boolean verify(Token token);
+
+    ValidationResult verifyResult(Token token);
 
 }
