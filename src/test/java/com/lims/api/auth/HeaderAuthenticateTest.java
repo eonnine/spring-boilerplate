@@ -2,7 +2,7 @@ package com.lims.api.auth;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lims.api.common.properties.AuthProperties;
+import com.lims.api.common.properties.auth.AuthProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

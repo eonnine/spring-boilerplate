@@ -4,7 +4,7 @@ import com.lims.api.auth.service.TokenAuthenticationProvider;
 import com.lims.api.auth.service.TokenHttpHelper;
 import com.lims.api.auth.service.TokenProvider;
 import com.lims.api.auth.service.impl.AuthenticationFactory;
-import com.lims.api.common.properties.AuthProperties;
+import com.lims.api.common.properties.auth.AuthProperties;
 import com.lims.api.common.util.xss.XssJackson2HttpMessageConverter;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;

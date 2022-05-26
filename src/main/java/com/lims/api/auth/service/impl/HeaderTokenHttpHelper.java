@@ -3,7 +3,7 @@ package com.lims.api.auth.service.impl;
 import com.lims.api.auth.dto.AuthToken;
 import com.lims.api.auth.model.TokenResponse;
 import com.lims.api.auth.service.TokenHttpHelper;
-import com.lims.api.common.properties.AuthProperties;
+import com.lims.api.common.properties.auth.AuthProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 

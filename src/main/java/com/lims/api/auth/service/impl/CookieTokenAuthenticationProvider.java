@@ -1,8 +1,7 @@
 package com.lims.api.auth.service.impl;
 
 import com.lims.api.auth.service.TokenProvider;
-import com.lims.api.common.properties.AuthProperties;
-import org.springframework.http.ResponseCookie;
+import com.lims.api.common.properties.auth.AuthProperties;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
@@ -20,12 +19,14 @@ public class CookieTokenAuthenticationProvider extends RegularTokenAuthenticatio
 
     @Override
     public String getAccessToken(HttpServletRequest request) {
-        return findTokenInCookies(request.getCookies(), authProperties.getJwt().getAccessToken().getCookie().getName());
+//        return findTokenInCookies(request.getCookies(), authProperties.getJwt().getAccessToken().getCookie().getName());
+        return null;
     }
 
     @Override
     public String getRefreshToken(HttpServletRequest request) {
-        return findTokenInCookies(request.getCookies(), authProperties.getJwt().getRefreshToken().getCookie().getName());
+//        return findTokenInCookies(request.getCookies(), authProperties.getJwt().getRefreshToken().getCookie().getName());
+        return null;
     }
 
     private String findTokenInCookies(Cookie[] cookies, String cookieName) {

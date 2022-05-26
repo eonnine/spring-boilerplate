@@ -3,7 +3,7 @@ package com.lims.api.auth.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lims.api.auth.service.TokenProvider;
 import com.lims.api.common.dto.ValidationResult;
-import com.lims.api.common.properties.AuthProperties;
+import com.lims.api.common.properties.auth.AuthProperties;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.util.PatternMatchUtils;
 
@@ -30,7 +30,7 @@ public class HeaderTokenAuthenticationProvider extends RegularTokenAuthenticatio
     public ValidationResult verifyResult(String bearerToken) {
         String token = Optional.ofNullable(bearerToken)
                 .map(s ->  s.split(" "))
-                .filter(s -> s.length == 2 && authProperties.getType().equals(s[0]))
+//                .filter(s -> s.length == 2 && authProperties.getType().equals(s[0]))
                 .orElseGet(() -> new String[2])
                 [1];
         return super.verifyResult(token);

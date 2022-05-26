@@ -3,7 +3,7 @@ package com.lims.api.auth.service.impl;
 import com.lims.api.auth.service.TokenAuthenticationProvider;
 import com.lims.api.auth.service.TokenHttpHelper;
 import com.lims.api.auth.service.TokenProvider;
-import com.lims.api.common.properties.AuthProperties;
+import com.lims.api.common.properties.auth.AuthProperties;
 import lombok.extern.log4j.Log4j2;
 
 @Log4j2

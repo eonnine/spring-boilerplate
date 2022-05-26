@@ -5,7 +5,7 @@ import com.lims.api.auth.service.TokenAuthenticationProvider;
 import com.lims.api.auth.service.TokenProvider;
 import com.lims.api.common.dto.ValidationResult;
 import com.lims.api.common.exception.UnAuthenticatedException;
-import com.lims.api.common.properties.AuthProperties;
+import com.lims.api.common.properties.auth.AuthProperties;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
@@ -75,12 +75,12 @@ public abstract class RegularTokenAuthenticationProvider implements TokenAuthent
     }
 
     private AuthToken generateAuthToken() {
-        String accessToken = authTokenProvider.createToken(getExpiresAt(authProperties.getJwt().getAccessToken().getExpire()));
-        String refreshToken = authTokenProvider.createToken(getExpiresAt(authProperties.getJwt().getRefreshToken().getExpire()));
+//        String accessToken = authTokenProvider.createToken(getExpiresAt(authProperties.getJwt().getAccessToken().getExpire()));
+//        String refreshToken = authTokenProvider.createToken(getExpiresAt(authProperties.getJwt().getRefreshToken().getExpire()));
 
         return AuthToken.builder()
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
+//                .accessToken(accessToken)
+//                .refreshToken(refreshToken)
                 .build();
     }
 
@@ -96,12 +96,13 @@ public abstract class RegularTokenAuthenticationProvider implements TokenAuthent
         return Date.from(localDateTime.atZone(ZoneId.systemDefault()).toInstant());
     }
 
-    private Date getExpiresAt(AuthProperties.Expire expire) {
-        return dateOf(LocalDateTime.now()
-                .plusDays(expire.getDays())
-                .plusHours(expire.getHours())
-                .plusMinutes(expire.getMinutes())
-                .plusSeconds(expire.getSeconds()));
+    private Date getExpiresAt() {
+//        return dateOf(LocalDateTime.now()
+//                .plusDays(expire.getDays())
+//                .plusHours(expire.getHours())
+//                .plusMinutes(expire.getMinutes())
+//                .plusSeconds(expire.getSeconds()));
+        return new Date();
     }
 
     protected abstract String getAccessToken(HttpServletRequest request);

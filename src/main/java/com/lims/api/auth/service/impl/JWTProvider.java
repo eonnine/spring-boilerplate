@@ -8,7 +8,7 @@ import com.lims.api.auth.service.TokenProvider;
 import com.lims.api.common.dto.ValidationResult;
 import com.lims.api.common.exception.UnAuthenticatedException;
 import com.lims.api.common.i18n.service.LocaleMessageSource;
-import com.lims.api.common.properties.AuthProperties;
+import com.lims.api.common.properties.auth.AuthProperties;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
@@ -35,9 +35,9 @@ public class JWTProvider implements TokenProvider {
         this.messageSource = messageSource;
         this.authProperties = authProperties;
 
-        Algorithm algorithm = Algorithm.HMAC256(authProperties.getJwt().getSecret());
+//        Algorithm algorithm = Algorithm.HMAC256(authProperties.getJwt().getSecret());
         this.algorithm = algorithm;
-        this.verifier = JWT.require(algorithm).withIssuer(authProperties.getJwt().getIssuer()).build();
+//        this.verifier = JWT.require(algorithm).withIssuer(authProperties.getJwt().getIssuer()).build();
     }
 
     @Override
@@ -45,7 +45,7 @@ public class JWTProvider implements TokenProvider {
         return tokenPrefix() +
                 JWT.create()
                         .withHeader(header)
-                        .withIssuer(authProperties.getJwt().getIssuer())
+//                        .withIssuer(authProperties.getJwt().getIssuer())
                         .withNotBefore(nowDate())
                         .withIssuedAt(nowDate())
                         .withExpiresAt(expiresAt)
@@ -77,7 +77,8 @@ public class JWTProvider implements TokenProvider {
     }
 
     private String tokenPrefix() {
-        return Strings.isEmpty(authProperties.getType()) ? "" : authProperties.getType() + " ";
+//        return Strings.isEmpty(authProperties.getType()) ? "" : authProperties.getType() + " ";
+        return null;
     }
 
     private Date nowDate() {
