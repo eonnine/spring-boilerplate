@@ -7,7 +7,7 @@ import com.lims.api.auth.service.TokenAuthenticationService;
 import com.lims.api.auth.service.TokenHttpHelper;
 import com.lims.api.auth.service.TokenService;
 import com.lims.api.common.annotation.UseAuthToken;
-import com.lims.api.common.domain.ValidationResult;
+import com.lims.api.common.dto.ValidationResult;
 import com.lims.api.common.exception.UnAuthenticatedException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
