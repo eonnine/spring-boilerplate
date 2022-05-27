@@ -1,9 +1,10 @@
-package com.lims.api.common.dto;
+package com.lims.api.common.domain;
 
 import lombok.Getter;
 
 @Getter
 public class ValidationResult {
+
     private boolean verified;
     private String message;
 

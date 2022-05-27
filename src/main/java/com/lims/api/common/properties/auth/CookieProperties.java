@@ -7,18 +7,18 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 
 @Getter
 @ConstructorBinding
-@ConfigurationProperties(prefix = "auth.cookie")
+@ConfigurationProperties(prefix = "auth.token.cookie")
 public class CookieProperties {
     private final String defaultPath = "/";
     private final boolean secure;
     private final boolean httpOnly;
-    private final String sameSite;
+    private final SameSiteCookies sameSite;
     private final String path;
 
-    public CookieProperties(Boolean secure, Boolean httpOnly, String sameSite, String path) {
+    public CookieProperties(Boolean secure, Boolean httpOnly, SameSiteCookies sameSite, String path) {
         this.secure = secure == null ? false : secure;
         this.httpOnly = httpOnly == null ? true : httpOnly;
-        this.sameSite = sameSite == null ? SameSiteCookies.STRICT.getValue() : sameSite;
+        this.sameSite = sameSite == null ? SameSiteCookies.STRICT : sameSite;
         this.path = path == null ? defaultPath : path;
     }
 }

@@ -40,7 +40,7 @@ public abstract class RegularTokenAuthenticationService implements TokenAuthenti
 
             // TODO validation using user data
             if (username.equals("ERROR")) {
-                throw new UnAuthenticatedException("error.auth.unauthenticated");
+                throw new UnAuthenticatedException();
             }
 
             return generateAuthToken();

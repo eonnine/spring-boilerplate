@@ -15,10 +15,6 @@ server:
     whitelabel:
       enabled: false
 
-auth:
-  token:
-    strategy: header
-
 spring:
   devtools:
     livereload:
