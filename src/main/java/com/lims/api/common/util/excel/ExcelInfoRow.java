@@ -6,7 +6,7 @@ import java.util.function.Consumer;
 
 public class ExcelInfoRow {
 
-    private ExcelInfo[] columns;
+    private final ExcelInfo[] columns;
     private Consumer<XSSFRow> handler;
 
     public ExcelInfoRow(ExcelInfo... columns) {

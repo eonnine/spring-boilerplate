@@ -4,7 +4,6 @@ import com.lims.api.auth.dto.AuthToken;
 import com.lims.api.auth.model.AuthenticationRequest;
 import com.lims.api.auth.model.TokenResponse;
 import com.lims.api.auth.service.TokenAuthenticationService;
-import com.lims.api.auth.service.TokenHttpHelper;
 import com.lims.api.auth.service.TokenService;
 import com.lims.api.common.annotation.UseAuthToken;
 import com.lims.api.common.dto.ValidationResult;
@@ -22,18 +21,17 @@ public class AuthenticationController {
 
     private final TokenAuthenticationService authenticationService;
     private final TokenService tokenService;
-    private final TokenHttpHelper tokenHttpHelper;
 
     @PostMapping(value = "token")
     public ResponseEntity<TokenResponse> login(@Validated @RequestBody AuthenticationRequest request) throws UnAuthenticatedException {
         AuthToken authToken = authenticationService.authenticate(request.getUsername(), request.getPassword());
-        return tokenHttpHelper.toResponseEntity(HttpStatus.CREATED, authToken);
+        return authenticationService.toResponseEntity(HttpStatus.CREATED, authToken);
     }
 
     @PostMapping(value = "token/reissue")
     public ResponseEntity<TokenResponse> refreshToken(@UseAuthToken AuthToken token) throws UnAuthenticatedException {
         AuthToken authToken = authenticationService.authenticate(token.getRefreshToken());
-        return tokenHttpHelper.toResponseEntity(HttpStatus.CREATED, authToken);
+        return authenticationService.toResponseEntity(HttpStatus.CREATED, authToken);
     }
 
     @GetMapping(value = "token/verification")

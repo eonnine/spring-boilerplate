@@ -4,7 +4,7 @@ import org.apache.poi.ss.usermodel.CellStyle;
 
 public class ExcelInfo {
 
-    private Object value;
+    private final Object value;
     private CellStyle cellStyle;
 
     public ExcelInfo(Object value) {

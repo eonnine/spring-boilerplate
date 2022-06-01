@@ -135,9 +135,9 @@ public class ExcelCreator {
 
     private void setValueToCell(XSSFCell cell, Object value) {
         if (value instanceof Integer) {
-            cell.setCellValue(((Integer) value).intValue());
+            cell.setCellValue((Integer) value);
         } else if (value instanceof Float) {
-            cell.setCellValue(((Float) value).floatValue());
+            cell.setCellValue((Float) value);
         } else {
             cell.setCellValue(value.toString());
         }

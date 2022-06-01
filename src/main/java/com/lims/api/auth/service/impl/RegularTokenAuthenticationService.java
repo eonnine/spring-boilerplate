@@ -2,15 +2,19 @@ package com.lims.api.auth.service.impl;
 
 import com.lims.api.auth.domain.Token;
 import com.lims.api.auth.dto.AuthToken;
+import com.lims.api.auth.model.TokenResponse;
 import com.lims.api.auth.service.TokenAuthenticationService;
 import com.lims.api.auth.service.TokenService;
+import com.lims.api.auth.service.TokenStrategy;
 import com.lims.api.common.exception.UnAuthenticatedException;
-import com.lims.api.common.properties.auth.AuthProperties;
-import com.lims.api.common.properties.auth.TokenProperties;
+import com.lims.api.common.properties.auth.AccessTokenProperties;
+import com.lims.api.common.properties.auth.RefreshTokenProperties;
 import com.lims.api.common.properties.auth.domain.ExpireProperty;
-import com.lims.api.common.properties.auth.domain.TokenProperty;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,17 +23,14 @@ import java.time.ZoneId;
 import java.util.Date;
 
 @Log4j2
-public abstract class RegularTokenAuthenticationService implements TokenAuthenticationService {
+@Service
+@RequiredArgsConstructor
+public class RegularTokenAuthenticationService implements TokenAuthenticationService {
 
-    private final TokenProperty accessTokenProperties;
-    private final TokenProperty refreshTokenProperties;
+    private final TokenStrategy tokenStrategy;
+    private final AccessTokenProperties accessTokenProperties;
+    private final RefreshTokenProperties refreshTokenProperties;
     private final TokenService tokenService;
-
-    public RegularTokenAuthenticationService(TokenProperties tokenProperties, TokenService tokenService) {
-        this.accessTokenProperties = tokenProperties.getAccessToken();
-        this.refreshTokenProperties = tokenProperties.getRefreshToken();
-        this.tokenService = tokenService;
-    }
 
     @Override
     public AuthToken authenticate(String username, String password) {
@@ -95,12 +96,16 @@ public abstract class RegularTokenAuthenticationService implements TokenAuthenti
     @Override
     public final AuthToken getAuthToken(HttpServletRequest request) {
         return AuthToken.builder()
-                .accessToken(getAccessToken(request))
-                .refreshToken(getRefreshToken(request))
+                .accessToken(tokenStrategy.findAccessToken(request))
+                .refreshToken(tokenStrategy.findRefreshToken(request))
                 .build();
     }
 
-    protected abstract Token getAccessToken(HttpServletRequest request);
-
-    protected abstract Token getRefreshToken(HttpServletRequest request);
+    @Override
+    public ResponseEntity<TokenResponse> toResponseEntity(HttpStatus status, AuthToken authToken) {
+        return ResponseEntity
+                .status(status)
+                .headers(tokenStrategy.makeResponseHeader(authToken))
+                .body(tokenStrategy.makeResponseBody(authToken));
+    }
 }

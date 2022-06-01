@@ -3,10 +3,11 @@ package com.lims.api.auth.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lims.api.auth.domain.HeaderStrategyCondition;
 import com.lims.api.auth.domain.Token;
-import com.lims.api.auth.service.TokenService;
-import com.lims.api.common.properties.auth.AccessTokenProperties;
+import com.lims.api.auth.dto.AuthToken;
+import com.lims.api.auth.model.TokenResponse;
+import com.lims.api.auth.service.TokenStrategy;
 import com.lims.api.common.properties.auth.RefreshTokenProperties;
-import com.lims.api.common.properties.auth.TokenProperties;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
@@ -20,31 +21,27 @@ import java.util.stream.Collectors;
 @Log4j2
 @Service
 @Conditional(HeaderStrategyCondition.class)
-public class HeaderTokenAuthenticationService extends RegularTokenAuthenticationService {
+@RequiredArgsConstructor
+public class HeaderTokenStrategy implements TokenStrategy {
 
-    private final String authHeaderName = "authorization";
     private final String[] targetMethods = { "POST" };
-    private final String paramName = "refreshToken";
+    private final RefreshTokenProperties refreshTokenProperties;
 
-    public HeaderTokenAuthenticationService(TokenProperties tokenProperties, TokenService tokenService) {
-        super(tokenProperties, tokenService);
+    @Override
+    public Token findAccessToken(HttpServletRequest request) {
+        return new Token(request.getHeader("authorization"));
     }
 
     @Override
-    protected Token getAccessToken(HttpServletRequest request) {
-        return new Token(request.getHeader(authHeaderName));
-    }
-
-    @Override
-    protected Token getRefreshToken(HttpServletRequest request) {
+    public Token findRefreshToken(HttpServletRequest request) {
         if (PatternMatchUtils.simpleMatch(targetMethods, request.getMethod().toUpperCase())) {
-            return new Token(getRefreshTokenAtBody(request));
+            return new Token(getRefreshTokenAtBody(request, refreshTokenProperties.getName()));
         }
         return null;
     }
 
     @SuppressWarnings("unchecked")
-    private String getRefreshTokenAtBody(HttpServletRequest request) {
+    private String getRefreshTokenAtBody(HttpServletRequest request, String paramName) {
         try {
             ObjectMapper mapper = new ObjectMapper();
             String bodyString = request.getReader().lines().collect(Collectors.joining(System.lineSeparator()));
@@ -55,4 +52,10 @@ public class HeaderTokenAuthenticationService extends RegularTokenAuthentication
             return null;
         }
     }
+
+    @Override
+    public TokenResponse makeResponseBody(AuthToken authToken) {
+        return new TokenResponse().toResponse(authToken);
+    }
+
 }

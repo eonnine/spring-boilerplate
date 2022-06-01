@@ -15,20 +15,5 @@ public class AuthenticationRequest {
 
     @NotBlank
     private String password;
-
-    private Integer num;
-
-    private AuthenticationRequest child;
-
-    private List<String> list;
-
-    private boolean veri;
-
-    @Override
-    public String toString() {
-        return "AuthenticationRequest{" +
-                "username='" + username + '\'' +
-                ", password='" + password + '\'' +
-                '}';
-    }
+    
 }
