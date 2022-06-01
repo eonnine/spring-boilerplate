@@ -1,10 +1,23 @@
 auth:
-  strategy: header
-  jwt:
-    secret: SECRET_KEY
+  strategy: token
+  token:
+    strategy: header
+    cookie:
+      path: /
+      http-only: true
+      secure: false
+      same-site: Strict
+    secret: secret-key
+    issuer: lims
     access-token:
       expire:
+        days: 0
+        hours: 0
         minutes: 30
+        seconds: 0
     refresh-token:
       expire:
-        hours: 2
+        days: 0
+        hours: 1
+        minutes: 0
+        seconds: 0

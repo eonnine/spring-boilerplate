@@ -21,6 +21,6 @@ public class RefreshTokenProperties extends TokenProperty {
 
     @Override
     protected RefreshTokenExpireProperties getDefaultExpire() {
-        return new RefreshTokenExpireProperties(null, 2L, null, null);
+        return new RefreshTokenExpireProperties(null, 1L, null, null);
     }
 }

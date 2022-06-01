@@ -4,6 +4,7 @@ import lombok.Getter;
 
 @Getter
 public class ValidationResult {
+
     private boolean verified;
     private String message;
 

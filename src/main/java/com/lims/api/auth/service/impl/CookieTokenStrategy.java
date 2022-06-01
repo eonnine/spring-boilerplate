@@ -63,7 +63,7 @@ public class CookieTokenStrategy implements TokenStrategy {
                 .from(tokenProperty.getName(), token.get())
                 .maxAge(tokenProperty.getExpire().getMaxAge())
                 .secure(cookieProperties.isSecure())
-                .sameSite(cookieProperties.getSameSite())
+                .sameSite(cookieProperties.getSameSite().getValue())
                 .httpOnly(cookieProperties.isHttpOnly())
                 .path(cookieProperties.getPath())
                 .build();

@@ -7,8 +7,6 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.lims.api.auth.domain.Token;
 import com.lims.api.auth.service.TokenService;
 import com.lims.api.common.dto.ValidationResult;
-import com.lims.api.common.exception.UnAuthenticatedException;
-import com.lims.api.common.i18n.service.LocaleMessageSource;
 import com.lims.api.common.properties.auth.TokenProperties;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.util.Strings;
@@ -24,7 +22,6 @@ import java.util.Optional;
 @Service
 public class JWTService implements TokenService {
 
-    private final LocaleMessageSource messageSource;
     private final Algorithm algorithm;
     private final JWTVerifier verifier;
     private final String issuer;
@@ -34,11 +31,10 @@ public class JWTService implements TokenService {
             "typ", "JWT"
     );
 
-    public JWTService(LocaleMessageSource messageSource, TokenProperties tokenProperties) {
+    public JWTService(TokenProperties tokenProperties) {
         Algorithm algorithm = Algorithm.HMAC256(tokenProperties.getSecret());
         String issuer = tokenProperties.getIssuer();
 
-        this.messageSource = messageSource;
         this.algorithm = algorithm;
         this.verifier = JWT.require(algorithm).withIssuer(issuer).build();
         this.issuer = tokenProperties.getIssuer();
@@ -70,25 +66,23 @@ public class JWTService implements TokenService {
             String jwt = token.get();
 
             if (Strings.isEmpty(jwt)) {
-                throw new UnAuthenticatedException("error.auth.notFoundAuthorization");
+                throw new IllegalArgumentException("error.auth.notFoundAuthorization");
             }
 
             verifier.verify(removePrefix(jwt));
-
             return new ValidationResult(true);
 
         } catch(JWTVerificationException e) {
             log.error("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
             return new ValidationResult(false, e.getMessage());
 
-        } catch (UnAuthenticatedException e) {
-            String message = messageSource.getMessage(e.getMessageCode());
-            log.error("[{}] Not found token. {}", this.getClass(), message);
-            return new ValidationResult(false, message);
+        } catch (IllegalArgumentException e) {
+            log.error("[{}] Not found token. {}", this.getClass(), e.getMessage());
+            return new ValidationResult(false, e.getMessage());
 
         } catch (Exception e){
             log.error("[{}] Throw Exception during verify authentication. {}", this.getClass(), e.getMessage());
-            return new ValidationResult(false, messageSource.getMessage("error.auth.invalidToken"));
+            return new ValidationResult(false, "error.auth.invalidToken");
         }
     }
 

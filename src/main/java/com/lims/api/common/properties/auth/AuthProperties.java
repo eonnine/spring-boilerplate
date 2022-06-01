@@ -11,11 +11,13 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 public class AuthProperties {
     private final AuthStrategyProperty strategy;
     private final TokenProperties token;
-    private final CookieProperties cookie;
 
-    public AuthProperties(AuthStrategyProperty strategy, TokenProperties token, CookieProperties cookie) {
+    public AuthProperties(AuthStrategyProperty strategy, TokenProperties token) {
         this.strategy = strategy == null ? AuthStrategyProperty.TOKEN : strategy;
-        this.token = token == null ? new TokenProperties(null, null, null, null, null) : token;
-        this.cookie = cookie == null ? new CookieProperties(null, null, null, null) : cookie;
+        this.token = token == null ? getDefaultToken() : token;
+    }
+
+    private TokenProperties getDefaultToken() {
+       return new TokenProperties(null, null, null, null, null, null);
     }
 }
