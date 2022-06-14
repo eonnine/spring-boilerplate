@@ -1,4 +1,4 @@
-package com.lims.api.common.i18n;
+package com.lims.api.common.service;
 
 public interface LocaleMessageSource {
 

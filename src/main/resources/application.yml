@@ -1,3 +1,8 @@
+server:
+  servlet:
+    session:
+      persistent: true
+
 spring:
   profiles:
     active: local

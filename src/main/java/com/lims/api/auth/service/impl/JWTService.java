@@ -6,7 +6,6 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.lims.api.auth.domain.Token;
 import com.lims.api.auth.service.TokenService;
-import com.lims.api.common.dto.ValidationResult;
 import com.lims.api.config.properties.auth.TokenProperties;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.util.Strings;
@@ -56,33 +55,26 @@ public class JWTService implements TokenService {
     }
 
     @Override
-    public final boolean verify(Token token) {
-        return verifyResult(token).isVerified();
-    }
-
-    @Override
-    public ValidationResult verifyResult(Token token) {
+    public boolean verify(Token token) {
         try {
             String jwt = token.get();
 
             if (Strings.isEmpty(jwt)) {
-                throw new IllegalArgumentException("error.auth.notFoundAuthorization");
+                throw new IllegalArgumentException();
             }
 
             verifier.verify(removePrefix(jwt));
-            return new ValidationResult(true);
+            return true;
 
         } catch(JWTVerificationException e) {
             log.error("[{}] Failed to verify auth token. {}", this.getClass(), e.getMessage());
-            return new ValidationResult(false, e.getMessage());
-
+            return false;
         } catch (IllegalArgumentException e) {
-            log.error("[{}] Not found token. {}", this.getClass(), e.getMessage());
-            return new ValidationResult(false, e.getMessage());
-
+            log.error("[{}] Not found token.", this.getClass());
+            return false;
         } catch (Exception e){
             log.error("[{}] Throw Exception during verify authentication. {}", this.getClass(), e.getMessage());
-            return new ValidationResult(false, "error.auth.invalidToken");
+            return false;
         }
     }
 

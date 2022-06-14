@@ -6,6 +6,7 @@ import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.service.TokenAuthenticationService;
 import com.lims.api.auth.service.TokenService;
 import com.lims.api.common.exception.UnAuthenticatedAccessException;
+import com.lims.api.common.session.AuthTokenSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.lang.JoinPoint;
@@ -31,8 +32,10 @@ public class AuthCheckAspect {
         HttpServletRequest request = ((ServletRequestAttributes)RequestContextHolder.currentRequestAttributes()).getRequest();
         AuthToken authToken = authenticationService.getAuthToken(request);
         Token accessToken = authToken.getAccessToken();
+        Token refreshToken = authToken.getRefreshToken();
+        boolean validTokenSession = AuthTokenSession.existsAndEquals(request.getSession(false), accessToken, refreshToken);
 
-        if (!tokenService.verify(accessToken)) {
+        if (!validTokenSession || !tokenService.verify(accessToken)) {
             // TODO change token to user_id in logging
             log.warn("[{}] Unauthorized Access. token: {}", this.getClass(), accessToken);
             throw new UnAuthenticatedAccessException();

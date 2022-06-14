@@ -2,14 +2,17 @@ package com.lims.api.common.advice;
 
 import com.lims.api.common.exception.UnAuthenticatedAccessException;
 import com.lims.api.common.exception.UnAuthenticatedException;
-import com.lims.api.common.i18n.LocaleMessageSource;
+import com.lims.api.common.service.LocaleMessageSource;
 import com.lims.api.common.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class GeneralExceptionAdvice {
@@ -38,6 +41,18 @@ public class GeneralExceptionAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> httpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         return new ResponseEntity<>(new ErrorResponse(messageSource.getMessage("error,http.notAllowMethod")), HttpStatus.METHOD_NOT_ALLOWED);
+    }
+
+    @ExceptionHandler
+    public ResponseEntity<ErrorResponse> methodArgumentNotValidException(MethodArgumentNotValidException e) {
+        String message = e.getBindingResult().getFieldErrors().stream()
+                .map(fieldError -> {
+                    return "'" + fieldError.getField() +"' is " +
+                            fieldError.getDefaultMessage() +
+                            ". value=[" + fieldError.getRejectedValue() + "]";
+                })
+                .collect(Collectors.joining(", "));
+        return new ResponseEntity<>(new ErrorResponse(message), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
