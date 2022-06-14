@@ -1,6 +1,6 @@
 package com.lims.api.auth.controller;
 
-import com.lims.api.auth.dto.AuthToken;
+import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.model.AuthenticationRequest;
 import com.lims.api.auth.model.TokenResponse;
 import com.lims.api.auth.service.TokenAuthenticationService;

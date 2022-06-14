@@ -1,7 +1,7 @@
 package com.lims.api.auth.service;
 
 import com.lims.api.auth.domain.Token;
-import com.lims.api.auth.dto.AuthToken;
+import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.model.TokenResponse;
 import org.springframework.http.HttpHeaders;
 

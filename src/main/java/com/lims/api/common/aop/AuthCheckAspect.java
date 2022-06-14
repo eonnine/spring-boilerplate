@@ -2,7 +2,7 @@ package com.lims.api.common.aop;
 
 
 import com.lims.api.auth.domain.Token;
-import com.lims.api.auth.dto.AuthToken;
+import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.service.TokenAuthenticationService;
 import com.lims.api.auth.service.TokenService;
 import com.lims.api.common.exception.UnAuthenticatedAccessException;

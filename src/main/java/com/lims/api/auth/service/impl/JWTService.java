@@ -7,7 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.lims.api.auth.domain.Token;
 import com.lims.api.auth.service.TokenService;
 import com.lims.api.common.dto.ValidationResult;
-import com.lims.api.common.properties.auth.TokenProperties;
+import com.lims.api.config.properties.auth.TokenProperties;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;

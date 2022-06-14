@@ -1,6 +1,6 @@
 package com.lims.api.auth.domain;
 
-import com.lims.api.common.properties.auth.domain.TokenStrategyProperty;
+import com.lims.api.config.properties.auth.domain.TokenStrategyProperty;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;

@@ -2,12 +2,12 @@ package com.lims.api.auth.service.impl;
 
 import com.lims.api.auth.domain.CookieStrategyCondition;
 import com.lims.api.auth.domain.Token;
-import com.lims.api.auth.dto.AuthToken;
+import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.service.TokenStrategy;
-import com.lims.api.common.properties.auth.AccessTokenProperties;
-import com.lims.api.common.properties.auth.CookieProperties;
-import com.lims.api.common.properties.auth.RefreshTokenProperties;
-import com.lims.api.common.properties.auth.domain.TokenProperty;
+import com.lims.api.config.properties.auth.AccessTokenProperties;
+import com.lims.api.config.properties.auth.CookieProperties;
+import com.lims.api.config.properties.auth.RefreshTokenProperties;
+import com.lims.api.config.properties.auth.domain.TokenProperty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.http.HttpHeaders;

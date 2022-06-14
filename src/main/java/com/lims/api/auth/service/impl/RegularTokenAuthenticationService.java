@@ -1,15 +1,15 @@
 package com.lims.api.auth.service.impl;
 
 import com.lims.api.auth.domain.Token;
-import com.lims.api.auth.dto.AuthToken;
+import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.model.TokenResponse;
 import com.lims.api.auth.service.TokenAuthenticationService;
 import com.lims.api.auth.service.TokenService;
 import com.lims.api.auth.service.TokenStrategy;
 import com.lims.api.common.exception.UnAuthenticatedException;
-import com.lims.api.common.properties.auth.AccessTokenProperties;
-import com.lims.api.common.properties.auth.RefreshTokenProperties;
-import com.lims.api.common.properties.auth.domain.ExpireProperty;
+import com.lims.api.config.properties.auth.AccessTokenProperties;
+import com.lims.api.config.properties.auth.RefreshTokenProperties;
+import com.lims.api.config.properties.auth.domain.ExpireProperty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;

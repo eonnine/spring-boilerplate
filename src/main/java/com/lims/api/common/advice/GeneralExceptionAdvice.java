@@ -2,7 +2,7 @@ package com.lims.api.common.advice;
 
 import com.lims.api.common.exception.UnAuthenticatedAccessException;
 import com.lims.api.common.exception.UnAuthenticatedException;
-import com.lims.api.common.i18n.service.LocaleMessageSource;
+import com.lims.api.common.i18n.LocaleMessageSource;
 import com.lims.api.common.model.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
