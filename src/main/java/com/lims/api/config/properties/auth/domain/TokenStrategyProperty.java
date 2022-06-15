@@ -23,4 +23,8 @@ public enum TokenStrategyProperty {
     public String getPrefix() {
         return prefix;
     }
+
+    public static TokenStrategyProperty getDefaultStrategy() {
+        return TokenStrategyProperty.COOKIE;
+    }
 }

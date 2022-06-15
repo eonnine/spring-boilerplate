@@ -1,11 +1,11 @@
 package com.lims.api.auth.service.impl;
 
-import com.lims.api.auth.domain.Token;
 import com.lims.api.auth.domain.AuthToken;
+import com.lims.api.auth.domain.Token;
 import com.lims.api.auth.model.TokenResponse;
 import com.lims.api.auth.service.TokenAuthenticationService;
+import com.lims.api.auth.service.TokenAuthenticationStrategy;
 import com.lims.api.auth.service.TokenService;
-import com.lims.api.auth.service.TokenStrategy;
 import com.lims.api.common.exception.UnAuthenticatedException;
 import com.lims.api.config.properties.auth.AccessTokenProperties;
 import com.lims.api.config.properties.auth.RefreshTokenProperties;
@@ -27,9 +27,9 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class RegularTokenAuthenticationService implements TokenAuthenticationService {
 
-    private final TokenStrategy tokenStrategy;
     private final AccessTokenProperties accessTokenProperties;
     private final RefreshTokenProperties refreshTokenProperties;
+    private final TokenAuthenticationStrategy tokenAuthenticationStrategy;
     private final TokenService tokenService;
 
     @Override
@@ -95,17 +95,14 @@ public class RegularTokenAuthenticationService implements TokenAuthenticationSer
 
     @Override
     public final AuthToken getAuthToken(HttpServletRequest request) {
-        return AuthToken.builder()
-                .accessToken(tokenStrategy.findAccessToken(request))
-                .refreshToken(tokenStrategy.findRefreshToken(request))
-                .build();
+        return tokenAuthenticationStrategy.getAuthenticationAt(request);
     }
 
     @Override
     public ResponseEntity<TokenResponse> toResponseEntity(HttpStatus status, AuthToken authToken) {
         return ResponseEntity
                 .status(status)
-                .headers(tokenStrategy.makeResponseHeader(authToken))
-                .body(tokenStrategy.makeResponseBody(authToken));
+                .headers(tokenAuthenticationStrategy.makeResponseHeader(authToken))
+                .body(tokenAuthenticationStrategy.makeResponseBody(authToken));
     }
 }

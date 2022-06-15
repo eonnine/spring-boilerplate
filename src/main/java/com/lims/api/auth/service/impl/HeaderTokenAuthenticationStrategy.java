@@ -1,11 +1,11 @@
 package com.lims.api.auth.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lims.api.auth.domain.HeaderStrategyCondition;
-import com.lims.api.auth.domain.Token;
 import com.lims.api.auth.domain.AuthToken;
+import com.lims.api.auth.condition.HeaderTokenStrategyCondition;
+import com.lims.api.auth.domain.Token;
 import com.lims.api.auth.model.TokenResponse;
-import com.lims.api.auth.service.TokenStrategy;
+import com.lims.api.auth.service.TokenAuthenticationStrategy;
 import com.lims.api.config.properties.auth.RefreshTokenProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,19 +20,26 @@ import java.util.stream.Collectors;
 
 @Log4j2
 @Service
-@Conditional(HeaderStrategyCondition.class)
+@Conditional(HeaderTokenStrategyCondition.class)
 @RequiredArgsConstructor
-public class HeaderTokenStrategy implements TokenStrategy {
+public class HeaderTokenAuthenticationStrategy implements TokenAuthenticationStrategy {
 
+    private final String headerName = "authorization";
     private final String[] targetMethods = { "POST" };
     private final RefreshTokenProperties refreshTokenProperties;
 
     @Override
-    public Token findAccessToken(HttpServletRequest request) {
-        return new Token(request.getHeader("authorization"));
+    public AuthToken getAuthenticationAt(HttpServletRequest request) {
+        return AuthToken.builder()
+                .accessToken(findAccessToken(request))
+                .refreshToken(findRefreshToken(request))
+                .build();
     }
 
-    @Override
+    public Token findAccessToken(HttpServletRequest request) {
+        return new Token(request.getHeader(headerName));
+    }
+
     public Token findRefreshToken(HttpServletRequest request) {
         if (PatternMatchUtils.simpleMatch(targetMethods, request.getMethod().toUpperCase())) {
             return new Token(getRefreshTokenAtBody(request, refreshTokenProperties.getName()));

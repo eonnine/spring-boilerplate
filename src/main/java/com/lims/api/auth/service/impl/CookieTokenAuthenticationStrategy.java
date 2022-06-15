@@ -1,14 +1,16 @@
 package com.lims.api.auth.service.impl;
 
-import com.lims.api.auth.domain.CookieStrategyCondition;
-import com.lims.api.auth.domain.Token;
+import com.lims.api.auth.condition.DefaultOrCookieTokenStrategyCondition;
 import com.lims.api.auth.domain.AuthToken;
-import com.lims.api.auth.service.TokenStrategy;
+import com.lims.api.auth.condition.CookieTokenStrategyCondition;
+import com.lims.api.auth.domain.Token;
+import com.lims.api.auth.service.TokenAuthenticationStrategy;
 import com.lims.api.config.properties.auth.AccessTokenProperties;
 import com.lims.api.config.properties.auth.CookieProperties;
 import com.lims.api.config.properties.auth.RefreshTokenProperties;
 import com.lims.api.config.properties.auth.domain.TokenProperty;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
@@ -20,21 +22,27 @@ import java.util.Arrays;
 import java.util.Optional;
 
 @Service
-@Conditional(CookieStrategyCondition.class)
+@Conditional(DefaultOrCookieTokenStrategyCondition.class)
 @RequiredArgsConstructor
-public class CookieTokenStrategy implements TokenStrategy {
+public class CookieTokenAuthenticationStrategy implements TokenAuthenticationStrategy {
 
     private final AccessTokenProperties accessTokenProperties;
     private final RefreshTokenProperties refreshTokenProperties;
     private final CookieProperties cookieProperties;
 
     @Override
-    public Token findAccessToken(HttpServletRequest request) {
+    public AuthToken getAuthenticationAt(HttpServletRequest request) {
+        return AuthToken.builder()
+                .accessToken(findAccessToken(request))
+                .refreshToken(findRefreshToken(request))
+                .build();
+    }
+
+    private Token findAccessToken(HttpServletRequest request) {
         return new Token(findTokenInCookies(request.getCookies(), accessTokenProperties.getName()));
     }
 
-    @Override
-    public Token findRefreshToken(HttpServletRequest request) {
+    private Token findRefreshToken(HttpServletRequest request) {
         return  new Token(findTokenInCookies(request.getCookies(), refreshTokenProperties.getName()));
     }
 

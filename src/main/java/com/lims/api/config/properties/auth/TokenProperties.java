@@ -27,7 +27,7 @@ public class TokenProperties {
         this.refreshToken = refreshToken == null ? new RefreshTokenProperties(null) : refreshToken;
         this.cookie = cookie == null ? new CookieProperties(null, null, null, null) : cookie;
 
-        TokenStrategyProperty finalStrategy = strategy == null ? TokenStrategyProperty.COOKIE : strategy;
+        TokenStrategyProperty finalStrategy = strategy == null ? TokenStrategyProperty.getDefaultStrategy() : strategy;
         this.strategy = finalStrategy;
         this.prefix = finalStrategy.getPrefix();
     }
