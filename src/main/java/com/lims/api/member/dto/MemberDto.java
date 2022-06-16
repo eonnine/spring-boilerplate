@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class MemberDto {
 
-    private String id;
+    private String userId;
 
 }

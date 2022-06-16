@@ -32,13 +32,16 @@ dependencies {
     // jwt
     implementation 'com.auth0:java-jwt:3.19.2'
 
+    // excel
+    implementation 'org.apache.poi:poi:5.2.2'
+    implementation 'org.apache.poi:poi-ooxml:5.2.2'
+
     // oracle 19c
     implementation 'com.oracle.ojdbc:ojdbc8:19.3.0.0'
     implementation 'com.oracle.ojdbc:orai18n:19.3.0.0'
 
-    // excel
-    implementation 'org.apache.poi:poi:5.2.2'
-    implementation 'org.apache.poi:poi-ooxml:5.2.2'
+    // mybatis
+    implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.2'
 
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
