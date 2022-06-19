@@ -1,6 +1,6 @@
 package com.lims.api.member.controller;
 
-import com.lims.api.member.repository.MemberDao;
+import com.lims.api.member.dao.MemberDao;
 import com.lims.api.member.dto.MemberDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +23,11 @@ public class MemberController {
 
     @PutMapping
     public ResponseEntity<Integer> updateMember() {
-        return ResponseEntity.ok(memberDao.updateMember("admin"));
+        MemberDto dto = MemberDto.builder()
+                .userId("adminUser")
+                .loginId("admin")
+                .build();
+        return ResponseEntity.ok(memberDao.updateMember(dto));
     }
 
     @PatchMapping
