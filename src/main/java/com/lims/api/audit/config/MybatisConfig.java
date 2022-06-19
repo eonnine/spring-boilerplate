@@ -1,24 +1,31 @@
-package com.lims.api.config;
+package com.lims.api.audit.config;
 
-import com.lims.api.common.interceptor.MybatisInterceptor;
-import com.lims.api.common.service.AuditTrailService;
-import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.aop.Advisor;
+import org.springframework.aop.aspectj.AspectJExpressionPointcut;
+import org.springframework.aop.support.DefaultPointcutAdvisor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.interceptor.*;
 
 import javax.sql.DataSource;
+import java.util.Collections;
+import java.util.List;
 import java.util.Properties;
 
 @Configuration
-@MapperScan(basePackages = {"com.lims.api.**.repository"})
-@RequiredArgsConstructor
+@MapperScan(basePackages = {"com.lims.api.**.dao"})
 public class MybatisConfig {
-
-    private final AuditTrailService auditTrailService;
+    /**
+     * TODO
+     * @optional
+     * - transaction 묶어서 처리하는 옵션
+     */
 
     @Bean
     public SqlSessionFactory sqlSessionFactory(ApplicationContext context, DataSource dataSource) throws Exception {
@@ -27,7 +34,6 @@ public class MybatisConfig {
         sessionFactory.setMapperLocations(context.getResources("classpath:mapper/*.xml"));
         sessionFactory.setTypeAliasesPackage("com.lims.api.**.dto");
         sessionFactory.setConfigurationProperties(getProperties());
-        sessionFactory.setPlugins(new MybatisInterceptor(auditTrailService));
         return sessionFactory.getObject();
     }
 
@@ -36,5 +42,4 @@ public class MybatisConfig {
         properties.setProperty("mapUnderscoreToCamelCase", "true");
         return properties;
     }
-
 }

@@ -34,7 +34,7 @@ public class AuthCheckAspect {
         AuthToken authToken = authenticationService.getAuthToken(request);
         Token accessToken = authToken.getAccessToken();
         Token refreshToken = authToken.getRefreshToken();
-        boolean validTokenSession = AuthTokenSession.existsAndEquals(request.getSession(false), accessToken, refreshToken);
+        boolean validTokenSession = AuthTokenSession.verify(request.getSession(false), accessToken, refreshToken);
 
         if (!validTokenSession || !tokenService.verify(accessToken)) {
             // TODO change token to user_id in logging

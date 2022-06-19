@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.lims.api.member.repository.MemberDao">
+<mapper namespace="com.lims.api.member.dao.MemberDao">
 
     <select id="findAll" resultType="MemberDto">
         SELECT * FROM SY_USER WHERE LOGIN_ID = #{value}
@@ -10,12 +10,16 @@
         SELECT * FROM SY_USER WHERE LOGIN_ID = #{value}
     </select>
 
-    <update id="updateMember">
-        UPDATE SY_USER SET LAST_CHANGE_DT = SYSDATE WHERE LOGIN_ID = #{value}
+    <update id="updateMember" parameterType="MemberDto">
+        UPDATE SY_USER SET LAST_CHANGE_DT = SYSDATE WHERE LOGIN_ID = #{loginId}
     </update>
 
     <update id="updateMember2">
         UPDATE SY_USER SET LAST_CHANGE_DT = SYSDATE WHERE LOGIN_ID = #{value}
     </update>
+
+    <delete id="deleteMember">
+        DELETE FROM SY_USER WHERE LOGIN_ID = '131231232423423432423'
+    </delete>
 
 </mapper>
