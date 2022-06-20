@@ -1,44 +1,63 @@
-package com.lims.api.audit.domain;
+package com.lims.api.audit.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import com.lims.api.audit.annotation.Audit;
 import com.lims.api.audit.annotation.AuditEntity;
 import com.lims.api.audit.annotation.AuditId;
-import lombok.RequiredArgsConstructor;
-import org.apache.commons.collections4.map.LinkedMap;
+import com.lims.api.audit.domain.SqlColumn;
+import com.lims.api.audit.domain.SqlParameter;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.session.SqlSession;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.poi.util.StringUtil;
-import org.apache.tomcat.util.json.JSONParser;
-import org.springframework.boot.json.GsonJsonParser;
-import org.springframework.boot.json.JsonParser;
-import org.springframework.boot.json.JsonParserFactory;
-import org.springframework.stereotype.Service;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.reflect.MethodSignature;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.security.InvalidParameterException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
-@Service
-@RequiredArgsConstructor
-public class AnnotationAuditTrail implements AuditTrail {
+public class AnnotationAuditTrailJoinPoint {
 
-    private final SqlSessionFactory sqlSessionFactory;
+    private AuditTrailRepository repository;
+    private ProceedingJoinPoint target;
 
-    @Override
-    public void record(Method method, Object[] args, Object executeResult) throws SQLException, NoSuchFieldException {
-        if (!isTarget(method, executeResult)) {
-            return;
+    public AnnotationAuditTrailJoinPoint(ProceedingJoinPoint joinPoint, AuditTrailRepository repository) {
+        this.target = joinPoint;
+        this.repository = repository;
+    }
+
+    public Object proceed() throws Throwable {
+        Method method = getMethod();
+
+        if (isIntReturnType(method)) {
+            preHandle();
         }
+
+        Object result = target.proceed();
+
+        if (isIntReturnType(method) && isUpdated((Integer) result)) {
+            postHandle();
+        }
+
+        return result;
+    }
+
+    private Method getMethod() {
+        MethodSignature signature = (MethodSignature) target.getSignature();
+        return signature.getMethod();
+    }
+
+    private Object getParameter() {
+        if (target.getArgs().length == 0) {
+            throw new IllegalArgumentException("Parameter not found. [" + getMethod().getName()  + "]");
+        }
+        return target.getArgs()[0];
+    }
+
+    private void preHandle() throws NoSuchFieldException, SQLException {
+        Method method = getMethod();
 
         assertHasAuditAnnotation(method);
 
@@ -50,43 +69,40 @@ public class AnnotationAuditTrail implements AuditTrail {
         AuditEntity entityAnnotation = entity.getAnnotation(AuditEntity.class);
         String tableName = entityAnnotation.name();
         List<String> columnNames = makeColumnNames(entity);
-        List<Field> idFields = getIdFields(entity);
+        List<SqlParameter> parameters = getSqlParameter(entity);
 
-        Object arg = args[0];
-        Class<?> parameterClazz = arg.getClass();
-        LinkedHashMap<String, Object> sqlParameters = new LinkedHashMap<>();
+        String sql = repository.makeSelectSql(tableName, columnNames, parameters);
+        List<SqlColumn> originData = repository.findAllById(sql, parameters);
+    }
+
+    private void postHandle() {
+        // TODO 체크 문자열 작성 (old data 기준으로 비교)
+
+        // TODO (grouping 설정에 따라 병합해서 insert or 개별 insert
+    }
+
+    private List<SqlParameter> getSqlParameter(Class<?> entity) throws NoSuchFieldException {
+        List<Field> idFields = getIdFields(entity);
+        Object parameter = getParameter();
+        Class<?> parameterClazz = parameter.getClass();
+
+        List<SqlParameter> sqlParameters = new ArrayList<>();
         try {
             for (Field field : idFields) {
                 Field parameterField = parameterClazz.getDeclaredField(field.getName());
                 parameterField.setAccessible(true);
-                Object value = parameterField.get(arg);
-                sqlParameters.put(field.getName(), value);
+
+                SqlParameter sqlParameter = SqlParameter.builder()
+                        .name(convertCamelToSnakeCase(parameterField.getName()))
+                        .value(parameterField.get(parameter))
+                        .build();
+
+                sqlParameters.add(sqlParameter);
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new NoSuchFieldException("Parameter '" + parameterClazz.getName() + "' has not a field matching the id field in the audit entity '" + entity.getName() + "'. [" + e.getMessage() + "]");
         }
-
-        executeQuery(tableName, columnNames, sqlParameters);
-    }
-
-    private void executeQuery(String tableName, List<String> columnNames, LinkedHashMap<String, Object> sqlParameters) throws SQLException {
-        String columns = String.join(", ", columnNames);
-        String sql = String.format("select %s from %s", columns, tableName);
-
-        try (
-                SqlSession sqlSession = sqlSessionFactory.openSession();
-                Connection connection = sqlSession.getConnection();
-                PreparedStatement statement = connection.prepareStatement(sql);
-        ) {
-
-            ResultSet resultSet = statement.executeQuery();
-
-//            while (resultSet.next()) {
-//                for (String fieldName : columnNames) {
-//                    System.out.println(resultSet.getString(fieldName));
-//                }
-//            }
-        }
+        return sqlParameters;
     }
 
     private List<Field> getIdFields(Class<?> entity) {
@@ -118,16 +134,12 @@ public class AnnotationAuditTrail implements AuditTrail {
                 .collect(Collectors.joining());
     }
 
-    private boolean isTarget(Method method, Object executeResult) {
-        return isIntReturnType(method.getReturnType()) && isUpdated((int) executeResult);
-    }
-
     private boolean isIntReturnType(Object returnType) {
         return returnType == Integer.class || returnType == int.class;
     }
 
     private boolean isUpdated(int count) {
-        return count > 0;
+        return count >= 0;
     }
 
     private void assertHasAuditAnnotation(Method method) {

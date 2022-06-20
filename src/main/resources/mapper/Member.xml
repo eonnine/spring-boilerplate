@@ -11,11 +11,15 @@
     </select>
 
     <update id="updateMember" parameterType="MemberDto">
-        UPDATE SY_USER SET LAST_CHANGE_DT = SYSDATE WHERE LOGIN_ID = #{loginId}
+        UPDATE SY_USER SET LAST_CHANGE_DT = TO_DATE('2020-06-20') WHERE LOGIN_ID = #{loginId}
     </update>
 
     <update id="updateMember2">
         UPDATE SY_USER SET LAST_CHANGE_DT = SYSDATE WHERE LOGIN_ID = #{value}
     </update>
+
+    <delete id="deleteMember">
+        DELETE FROM SY_USER WHERE LOGIN_ID = '131231232423423432423'
+    </delete>
 
 </mapper>

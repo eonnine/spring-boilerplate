@@ -20,4 +20,7 @@ public interface MemberDao {
     @Audit(target = Member.class)
     Integer updateMember2(String id);
 
+    @Audit(target = Member.class)
+    int deleteMember();
+
 }
