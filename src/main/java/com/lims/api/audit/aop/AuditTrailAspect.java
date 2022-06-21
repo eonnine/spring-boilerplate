@@ -1,6 +1,6 @@
 package com.lims.api.audit.aop;
 
-import com.lims.api.audit.service.impl.AnnotationAuditTrailJoinPoint;
+import com.lims.api.audit.service.impl.AnnotationAuditTrailContext;
 import com.lims.api.audit.service.impl.AuditTrailContainer;
 import com.lims.api.audit.service.impl.AuditTrailRecorder;
 import com.lims.api.audit.service.impl.AuditTrailRepository;
@@ -28,7 +28,7 @@ public class AuditTrailAspect {
     }
 
     @Pointcut("execution(* com.lims.api..dao.*.*(..))")
-    private void executionPoint() {}
+    private void repositoryPoint() {}
 
     @Pointcut("@annotation(com.lims.api.audit.annotation.Audit)")
     private void annotationPoint() {}
@@ -49,15 +49,14 @@ public class AuditTrailAspect {
      * -> no grouping이면 row별로 insert
      */
 
-    @Around("executionPoint() && annotationPoint()")
-    public Object AuditTrail(ProceedingJoinPoint joinPoint) throws Throwable {
-        return new AnnotationAuditTrailJoinPoint(joinPoint, new AuditTrailRepository(dataSource)).proceed();
+    @Around("repositoryPoint() && annotationPoint()")
+    public Object processing(ProceedingJoinPoint joinPoint) throws Throwable {
+        return new AnnotationAuditTrailContext(joinPoint, container, new AuditTrailRepository(dataSource)).proceed();
     }
 
 
     @Before("servicePoint()")
-    public void Transaction(JoinPoint joinPoint) throws Throwable {
-        System.out.println(joinPoint);
+    public void record(JoinPoint joinPoint) throws Throwable {
         TransactionSynchronizationManager.registerSynchronization(new AuditTrailRecorder(container));
     }
 

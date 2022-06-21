@@ -40,7 +40,7 @@ public class MemberController {
 
     @DeleteMapping
     public ResponseEntity<Integer> deleteMember() {
-        return ResponseEntity.ok(memberDao.deleteMember());
+        return null;
     }
 
 }

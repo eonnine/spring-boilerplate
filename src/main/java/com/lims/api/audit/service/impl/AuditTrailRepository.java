@@ -1,6 +1,6 @@
 package com.lims.api.audit.service.impl;
 
-import com.lims.api.audit.domain.SqlColumn;
+import com.lims.api.audit.domain.SqlRow;
 import com.lims.api.audit.domain.SqlParameter;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,8 +24,8 @@ public class AuditTrailRepository {
     }
 
     @Transactional
-    public List<SqlColumn> findAllById(String sql, List<SqlParameter> parameters) throws SQLException {
-        List<SqlColumn> result = new ArrayList<>();
+    public List<SqlRow> findAllById(String sql, List<SqlParameter> parameters) throws SQLException {
+        List<SqlRow> result = new ArrayList<>();
         Connection connection = getConnection();
         PreparedStatement statement = connection.prepareStatement(sql);
 
@@ -38,9 +38,8 @@ public class AuditTrailRepository {
         int columnCount = metaData.getColumnCount();
 
         while (resultSet.next()) {
-            SqlColumn column = new SqlColumn();
-            for (int i=0; i < columnCount; i++) {
-                metaData.getColumnName(i);
+            SqlRow column = new SqlRow();
+            for (int i=1; i <= columnCount; i++) {
                 column.put(metaData.getColumnName(i), resultSet.getString(i));
             }
             result.add(column);

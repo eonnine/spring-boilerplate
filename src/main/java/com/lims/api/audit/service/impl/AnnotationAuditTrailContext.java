@@ -3,42 +3,43 @@ package com.lims.api.audit.service.impl;
 import com.lims.api.audit.annotation.Audit;
 import com.lims.api.audit.annotation.AuditEntity;
 import com.lims.api.audit.annotation.AuditId;
-import com.lims.api.audit.domain.SqlColumn;
+import com.lims.api.audit.domain.AuditTrail;
+import com.lims.api.audit.domain.SqlRow;
 import com.lims.api.audit.domain.SqlParameter;
-import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.security.InvalidParameterException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class AnnotationAuditTrailJoinPoint {
+public class AnnotationAuditTrailContext {
 
-    private AuditTrailRepository repository;
-    private ProceedingJoinPoint target;
+    private final AuditTrailContainer container;
+    private final AuditTrailRepository repository;
+    private final ProceedingJoinPoint target;
 
-    public AnnotationAuditTrailJoinPoint(ProceedingJoinPoint joinPoint, AuditTrailRepository repository) {
+    public AnnotationAuditTrailContext(ProceedingJoinPoint joinPoint, AuditTrailContainer container, AuditTrailRepository repository) {
         this.target = joinPoint;
+        this.container = container;
         this.repository = repository;
     }
 
     public Object proceed() throws Throwable {
         Method method = getMethod();
 
-        if (isIntReturnType(method)) {
+        if (isIntReturnType(method.getReturnType())) {
             preHandle();
         }
 
         Object result = target.proceed();
 
-        if (isIntReturnType(method) && isUpdated((Integer) result)) {
-            postHandle();
+        if (isIntReturnType(method.getReturnType())) {
+            postHandle(result);
         }
 
         return result;
@@ -72,13 +73,56 @@ public class AnnotationAuditTrailJoinPoint {
         List<SqlParameter> parameters = getSqlParameter(entity);
 
         String sql = repository.makeSelectSql(tableName, columnNames, parameters);
-        List<SqlColumn> originData = repository.findAllById(sql, parameters);
+        List<SqlRow> originData = repository.findAllById(sql, parameters);
+
+        String transactionId;
+        if (AuditTrailTransaction.hasResourceCurrentTransaction()) {
+            transactionId = AuditTrailTransaction.getCurrentTransactionId();
+        } else {
+            transactionId = AuditTrailTransaction.initResourceCurrentTransaction();
+        }
+
+        AuditTrail auditTrail = AuditTrail.builder()
+                .type(auditAnnotation.type())
+                .label(auditAnnotation.label())
+                .content(auditAnnotation.content())
+                .origin(originData)
+                .build();
+
+        container.put(transactionId, auditTrail);
     }
 
-    private void postHandle() {
-        // TODO 체크 문자열 작성 (old data 기준으로 비교)
+    private void postHandle(Object updatedResult) throws NoSuchFieldException, SQLException {
+        // TODO 체크 문자열 작성 (old data 기준으로 비교(= entity 필드 기준으로))
+        Method method = getMethod();
 
-        // TODO (grouping 설정에 따라 병합해서 insert or 개별 insert
+        assertHasAuditAnnotation(method);
+
+        Audit auditAnnotation = method.getAnnotation(Audit.class);
+        Class<?> entity = auditAnnotation.target();
+
+        assertHasAuditEntityAnnotation(entity);
+
+        AuditEntity entityAnnotation = entity.getAnnotation(AuditEntity.class);
+        String tableName = entityAnnotation.name();
+        List<String> columnNames = makeColumnNames(entity);
+        List<SqlParameter> parameters = getSqlParameter(entity);
+
+        String sql = repository.makeSelectSql(tableName, columnNames, parameters);
+        List<SqlRow> updatedData = repository.findAllById(sql, parameters);
+
+        String transactionId;
+        if (AuditTrailTransaction.hasResourceCurrentTransaction()) {
+            transactionId = AuditTrailTransaction.getCurrentTransactionId();
+        } else {
+            transactionId = AuditTrailTransaction.initResourceCurrentTransaction();
+        }
+
+        List<AuditTrail> auditTrails = container.get(transactionId);
+
+        AuditTrail auditTrail = auditTrails.get(auditTrails.size() - 1);
+        auditTrail.setUpdatedRows(updatedData);
+        auditTrail.setUpdated(isUpdated((Integer) updatedResult));
     }
 
     private List<SqlParameter> getSqlParameter(Class<?> entity) throws NoSuchFieldException {
@@ -125,13 +169,6 @@ public class AnnotationAuditTrailJoinPoint {
     private String convertCamelToSnakeCase(String str) {
         String ret = str.replaceAll("([A-Z])", "_$1").replaceAll("([a-z][A-Z])", "$1_$2");
         return ret.toLowerCase();
-    }
-
-    private String convertSnakeToCamelCase(String str) {
-        String[] fragments = str.toLowerCase().split("_");
-        return fragments[0] + Arrays.stream(Arrays.copyOfRange(fragments, 1, fragments.length))
-                .map(s -> StringUtils.isEmpty(s) ? s : s.substring(0, 1).toUpperCase() + s.substring(1))
-                .collect(Collectors.joining());
     }
 
     private boolean isIntReturnType(Object returnType) {

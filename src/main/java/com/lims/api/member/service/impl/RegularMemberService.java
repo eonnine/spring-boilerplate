@@ -16,15 +16,13 @@ public class RegularMemberService implements MemberService {
     @Override
     public int updateMember(MemberDto dto) {
         int result = memberDao.updateMember(dto);
+//        memberDao.updateMember2("admin");
         deleteMember();
         return result;
     }
 
     public int deleteMember() {
-        System.out.println(TransactionSynchronizationManager.isSynchronizationActive());
-        System.out.println(TransactionSynchronizationManager.isActualTransactionActive());
-        System.out.println(TransactionSynchronizationManager.isCurrentTransactionReadOnly());
-        return memberDao.deleteMember();
+        return memberDao.deleteMember(MemberDto.builder().loginId("1231232123").build());
     }
 
 }
