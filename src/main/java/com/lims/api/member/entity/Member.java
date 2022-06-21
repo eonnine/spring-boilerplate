@@ -2,8 +2,6 @@ package com.lims.api.member.entity;
 
 import com.lims.api.audit.annotation.AuditEntity;
 import com.lims.api.audit.annotation.AuditId;
-import lombok.Builder;
-import lombok.Getter;
 
 @AuditEntity(name = "SY_USER")
 public class Member {
@@ -16,5 +14,6 @@ public class Member {
 
     private String userNm;
     private String password;
+    private String lastChangeDt;
 
 }

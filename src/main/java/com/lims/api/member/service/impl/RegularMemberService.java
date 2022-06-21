@@ -5,7 +5,6 @@ import com.lims.api.member.dto.MemberDto;
 import com.lims.api.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 @Service
 @RequiredArgsConstructor

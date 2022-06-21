@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
-public class AuditTrailContainer {
+public class AuditContainer {
 
-    private ConcurrentHashMap<String, List<AuditTrail>> store = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, List<AuditTrail>> store = new ConcurrentHashMap<>();
 
     public void put(String key, AuditTrail auditTrail) {
         if (has(key)) {
@@ -22,6 +22,12 @@ public class AuditTrailContainer {
 
     public List<AuditTrail> get(String key) {
         return has(key) ? store.get(key) : null;
+    }
+
+    public void remove(String key) {
+        if (has(key)) {
+            store.remove(key);
+        }
     }
 
     public boolean has(String key) {

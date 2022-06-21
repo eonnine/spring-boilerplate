@@ -1,9 +1,6 @@
 package com.lims.api.audit.aop;
 
-import com.lims.api.audit.service.impl.AnnotationAuditTrailContext;
-import com.lims.api.audit.service.impl.AuditTrailContainer;
-import com.lims.api.audit.service.impl.AuditTrailRecorder;
-import com.lims.api.audit.service.impl.AuditTrailRepository;
+import com.lims.api.audit.service.impl.*;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -13,18 +10,16 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import javax.sql.DataSource;
-
 @Aspect
 @Component
 public class AuditTrailAspect {
 
-    private final DataSource dataSource;
-    private final AuditTrailContainer container;
+    private final AuditContainer container;
+    private final AuditRepository repository;
 
-    public AuditTrailAspect(DataSource dataSource, AuditTrailContainer container) {
-        this.dataSource = dataSource;
+    public AuditTrailAspect(AuditContainer container, AuditRepository repository) {
         this.container = container;
+        this.repository = repository;
     }
 
     @Pointcut("execution(* com.lims.api..dao.*.*(..))")
@@ -36,28 +31,28 @@ public class AuditTrailAspect {
     @Pointcut("execution(* com.lims.api..service.*.*(..))")
     private void servicePoint() {}
 
-    /**
-     * TODO
-     * 예외 발생시 예외가 발생한 Dao & method name 출력
-     */
-
-    /**
-     * process
-     * - Transaction 시작시 store 생성
-     * - grouping이면 store에 그룹핑
-     * -> grouping이면 병합해서 insert
-     * -> no grouping이면 row별로 insert
-     */
-
     @Around("repositoryPoint() && annotationPoint()")
     public Object processing(ProceedingJoinPoint joinPoint) throws Throwable {
-        return new AnnotationAuditTrailContext(joinPoint, container, new AuditTrailRepository(dataSource)).proceed();
+        ProceedingJoinPoint auditJoinPoint = new AnnotationAuditJoinPoint(joinPoint, container, repository);
+        return auditJoinPoint.proceed();
     }
-
 
     @Before("servicePoint()")
-    public void record(JoinPoint joinPoint) throws Throwable {
-        TransactionSynchronizationManager.registerSynchronization(new AuditTrailRecorder(container));
+    public void transactionListener(JoinPoint joinPoint) throws Throwable {
+        TransactionSynchronizationManager.registerSynchronization(new AuditTransactionListener(container, repository));
     }
 
+    /**
+     * TODO
+     * - 예외 처리
+     * 예외 발생시 예외가 발생한 Dao & method name 출력
+     *
+     * - option 설정
+     * 1. grouping이면 store에 그룹핑
+     *  -> grouping이면 병합해서 insert
+     *  -> no grouping이면 row별로 insert
+     *
+     *
+     * 3. camel <-> snake
+     */
 }

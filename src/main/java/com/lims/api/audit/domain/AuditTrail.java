@@ -1,80 +1,84 @@
 package com.lims.api.audit.domain;
 
-import java.lang.reflect.Method;
+import org.apache.commons.lang3.StringUtils;
+
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AuditTrail {
-    private Method method;
-    private boolean updated;
     private AuditType type;
-    private String label;
-    private String content;
+    private String label = "";
+    private String content = "";
     private List<SqlRow> originRows;
     private List<SqlRow> updatedRows;
 
-    public AuditTrail(Method method, AuditType type, String label, String content, List<SqlRow> origin) {
+    public AuditTrail() {}
+
+    public String toDiffString() {
+        int limit = originRows.size();
+        List<String> result = new ArrayList<>();
+        for (int i=0; i < limit; i++) {
+            SqlRow originRow = originRows.get(i);
+            SqlRow updatedRow = updatedRows.get(i);
+            String rowString = originRow.entrySet().stream()
+                    .filter(origin -> {
+                        String key = origin.getKey();
+                        return updatedRow.containsKey(key) && !updatedRow.get(key).equals(origin.getValue());
+                    })
+                    .map(origin -> "{ " + origin.getKey() + ": [" + origin.getValue() + "] -> [" + updatedRow.get(origin.getKey()) + "] }")
+                    .collect(Collectors.joining(", "));
+
+            result.add(rowString);
+        }
+        return toLabelString() + toContentString() + String.join(" / ", result);
+    }
+
+    private String toLabelString() {
+        return StringUtils.isEmpty(label) ? "" : "[" + label + "]";
+    }
+
+    private String toContentString() {
+        return StringUtils.isEmpty(content) ? "" :  " " + content + " ";
+    }
+
+    public AuditType getType() {
+        return type;
+    }
+
+    public void setType(AuditType type) {
         this.type = type;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
         this.label = label;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
         this.content = content;
-        this.originRows = origin;
     }
 
-    public boolean isUpdated() { return this.updated; }
-
-    public String getDiffToString() {
-        return null;
+    public List<SqlRow> getOriginRows() {
+        return originRows;
     }
 
-    public void setUpdated(boolean updated) {
-        this.updated = updated;
+    public void setOriginRows(List<SqlRow> originRows) {
+        this.originRows = originRows;
     }
 
-    public void setUpdatedRows(List<SqlRow> updated) {
-        this.updatedRows = updated;
+    public List<SqlRow> getUpdatedRows() {
+        return updatedRows;
     }
 
-    public static AuditTrail.AuditTrailBuilder builder() {
-        return new AuditTrail.AuditTrailBuilder();
+    public void setUpdatedRows(List<SqlRow> updatedRows) {
+        this.updatedRows = updatedRows;
     }
-
-    public static class AuditTrailBuilder {
-        private Method method;
-        private AuditType type;
-        private String label;
-        private String content;
-        private List<SqlRow> originRows;
-
-        AuditTrailBuilder() {
-        }
-
-        public AuditTrail.AuditTrailBuilder type(Method method) {
-            this.method = method;
-            return this;
-        }
-
-        public AuditTrail.AuditTrailBuilder type(AuditType type) {
-            this.type = type;
-            return this;
-        }
-
-        public AuditTrail.AuditTrailBuilder label(Object value) {
-            this.label = label;
-            return this;
-        }
-
-        public AuditTrail.AuditTrailBuilder content(String content) {
-            this.content = content;
-            return this;
-        }
-
-        public AuditTrail.AuditTrailBuilder origin(List<SqlRow> origin) {
-            this.originRows = origin;
-            return this;
-        }
-
-        public AuditTrail build() {
-            return new AuditTrail(this.method, this.type, this.label, this.content, this.originRows);
-        }
-    }
-
 }
