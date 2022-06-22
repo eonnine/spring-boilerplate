@@ -1,6 +1,6 @@
 package com.lims.api.audit.domain;
 
-public enum StringCase {
+public enum ColumnNameConverter {
     CAMEL,
     SNAKE,
 }

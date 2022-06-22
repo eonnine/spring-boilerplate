@@ -1,9 +1,9 @@
 package com.lims.api.audit.service;
 
-import com.lims.api.audit.domain.StringCase;
+import com.lims.api.audit.domain.ColumnNameConverter;
 
 public interface StringCaseConverter {
 
-    public String convert(StringCase stringCase, String str);
+    public String convert(ColumnNameConverter stringCase, String str);
 
 }

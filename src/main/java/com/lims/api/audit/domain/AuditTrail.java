@@ -1,5 +1,6 @@
 package com.lims.api.audit.domain;
 
+import com.lims.api.audit.service.AuditTrailConfigurer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -7,7 +8,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class AuditTrail {
-    private AuditType type;
     private String label = "";
     private String content = "";
     private List<SqlRow> originRows;
@@ -15,67 +15,105 @@ public class AuditTrail {
 
     public AuditTrail() {}
 
-    public String toDiffString() {
+    public AuditString toAuditString(AuditTrailConfigurer configurer) {
+        return AuditString.builder()
+                .label(getLabel())
+                .content(getContent())
+                .diffString(getDiffString(configurer.displayType()))
+                .build();
+    }
+
+    public boolean isUpdated() {
+        boolean isUpdated = false;
         int limit = originRows.size();
-        List<String> result = new ArrayList<>();
         for (int i=0; i < limit; i++) {
+            SqlRow originRow = originRows.get(i);
+            SqlRow updatedRow = updatedRows.get(i);
+            boolean isSame = originRow.entrySet().stream()
+                    .allMatch(origin -> {
+                        String key = origin.getKey();
+                        SqlColumn originColumn = origin.getValue();
+
+                        if (!updatedRow.containsKey(key)) {
+                            return false;
+                        }
+                        SqlColumn updatedColumn = updatedRow.get(key);
+                        return equalsValue(updatedColumn.getValue(), originColumn.getValue());
+                    });
+
+            if (!isSame) {
+                isUpdated = true;
+                break;
+            }
+        }
+        return isUpdated;
+    }
+
+    private String getDiffString(DisplayType displayType) {
+        List<String> result = new ArrayList<>();
+
+        for (int i=0; i < originRows.size(); i++) {
             SqlRow originRow = originRows.get(i);
             SqlRow updatedRow = updatedRows.get(i);
             String rowString = originRow.entrySet().stream()
                     .filter(origin -> {
                         String key = origin.getKey();
-                        return updatedRow.containsKey(key) && !updatedRow.get(key).equals(origin.getValue());
+                        SqlColumn originColumn = origin.getValue();
+
+                        if (!updatedRow.containsKey(key)) {
+                            return false;
+                        }
+                        SqlColumn updatedColumn = updatedRow.get(key);
+                        return notEqualsValue(updatedColumn.getValue(), originColumn.getValue());
                     })
-                    .map(origin -> "{ " + origin.getKey() + ": [" + origin.getValue() + "] -> [" + updatedRow.get(origin.getKey()) + "] }")
+                    .map(origin -> "{ "
+                            + getColumnLabel(displayType, origin.getValue()) + ": "
+                            + "[" + origin.getValue() + "] -> "
+                            + "[" + updatedRow.get(origin.getKey()) + "]"
+                            + " }")
                     .collect(Collectors.joining(", "));
 
             result.add(rowString);
         }
-        return toLabelString() + toContentString() + String.join(" / ", result);
+        return String.join(" / ", result);
     }
 
-    private String toLabelString() {
-        return StringUtils.isEmpty(label) ? "" : "[" + label + "]";
+    private String getColumnLabel(DisplayType displayType, SqlColumn column) {
+        if (displayType.isColumn()) {
+            return column.getValue();
+        }
+        else if (displayType.isComment()) {
+            return StringUtils.isEmpty(column.getComment()) ? column.getValue() : column.getComment();
+        }
+        return "";
     }
 
-    private String toContentString() {
-        return StringUtils.isEmpty(content) ? "" :  " " + content + " ";
+    private boolean equalsValue(String s, String s2) {
+        return s.equals(s2);
     }
 
-    public AuditType getType() {
-        return type;
+    private boolean notEqualsValue(String s, String s2) {
+        return !s.equals(s2);
     }
 
-    public void setType(AuditType type) {
-        this.type = type;
-    }
-
-    public String getLabel() {
+    private String getLabel() {
         return label;
+    }
+
+    private String getContent() {
+        return content;
     }
 
     public void setLabel(String label) {
         this.label = label;
     }
 
-    public String getContent() {
-        return content;
-    }
-
     public void setContent(String content) {
         this.content = content;
     }
 
-    public List<SqlRow> getOriginRows() {
-        return originRows;
-    }
-
     public void setOriginRows(List<SqlRow> originRows) {
         this.originRows = originRows;
-    }
-
-    public List<SqlRow> getUpdatedRows() {
-        return updatedRows;
     }
 
     public void setUpdatedRows(List<SqlRow> updatedRows) {

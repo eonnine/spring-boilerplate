@@ -1,6 +1,6 @@
 package com.lims.api.audit.service.impl;
 
-import com.lims.api.audit.domain.StringCase;
+import com.lims.api.audit.domain.ColumnNameConverter;
 import com.lims.api.audit.service.StringCaseConverter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 
 public class SnakeCaseConverter implements StringCaseConverter {
 
-    private final Map<StringCase, Function<String, String>> cases = new HashMap<>();
+    private final Map<ColumnNameConverter, Function<String, String>> cases = new HashMap<>();
 
     public SnakeCaseConverter() {
-        cases.put(StringCase.CAMEL, this::toCamel);
+        cases.put(ColumnNameConverter.CAMEL, this::toCamel);
     }
 
     @Override
-    public String convert(StringCase stringCase, String str) {
+    public String convert(ColumnNameConverter stringCase, String str) {
         return cases.get(stringCase).apply(str);
     }
 

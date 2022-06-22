@@ -1,10 +1,10 @@
 package com.lims.api.audit.service.impl;
 
-import com.lims.api.audit.service.AuditSqlGenerator;
+import com.lims.api.audit.service.SqlGenerator;
 
 import java.util.List;
 
-public abstract class AbstractSqlGenerator implements AuditSqlGenerator {
+public abstract class AbstractSqlGenerator implements SqlGenerator {
 
     public static final String COMMENT_SUFFIX = "_$$COMMENTS";
 

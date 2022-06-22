@@ -6,7 +6,8 @@ import com.lims.api.audit.annotation.AuditId;
 import com.lims.api.audit.domain.AuditTrail;
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlRow;
-import com.lims.api.audit.service.AuditSqlGenerator;
+import com.lims.api.audit.service.AuditTrailConfigurer;
+import com.lims.api.audit.service.SqlGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -24,13 +25,15 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoint {
 
+    private final AuditTrailConfigurer configurer;
     private final ProceedingJoinPoint target;
     private final AuditContainer container;
     private final AuditRepository repository;
 
-    public AnnotationAuditJoinPoint(ProceedingJoinPoint joinPoint, AuditContainer container, AuditRepository repository) {
+    public AnnotationAuditJoinPoint(ProceedingJoinPoint joinPoint, AuditTrailConfigurer configurer, AuditContainer container, AuditRepository repository) {
         super((ProxyMethodInvocation) ExposeInvocationInterceptor.currentInvocation());
         this.target = joinPoint;
+        this.configurer = configurer;
         this.container = container;
         this.repository = repository;
     }
@@ -50,7 +53,8 @@ public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoin
         if (isPostSnapshotTarget(method, result)) {
             postSnapshot(method, args, result);
         }
-        else if (isCancelSnapshotTarget(method, result)) {
+
+        if (isCancelSnapshotTarget(method, result)) {
             cancelSnapshot();
         }
 
@@ -63,7 +67,6 @@ public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoin
         List<SqlRow> originData = getCurrentData(entityClazz, method, args);
 
         AuditTrail auditTrail = new AuditTrail();
-        auditTrail.setType(auditAnnotation.type());
         auditTrail.setLabel(auditAnnotation.label());
         auditTrail.setContent(auditAnnotation.content());
         auditTrail.setOriginRows(originData);
@@ -96,9 +99,14 @@ public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoin
         try {
             AuditEntity entityAnnotation = entityClazz.getAnnotation(AuditEntity.class);
             String tableName = entityAnnotation.name();
-            SqlEntity entity = new SqlEntity(tableName, entityClazz, getIdFields(entityClazz));
-            AuditSqlGenerator generator = new OracleAuditSqlGenerator(); // TODO 생성 패턴 적용
-            return repository.findAllById(new AuditSqlProvider(generator, entity), parameters);
+
+            SqlEntity entity = new SqlEntity();
+            entity.setName(tableName);
+            entity.setTarget(entityClazz);
+            entity.setIdFields(getIdFields(entityClazz));
+
+            SqlGenerator generator = new OracleSqlGenerator(); // TODO 생성 패턴 적용
+            return repository.findAllById(new SqlProvider(generator, entity), parameters);
         } catch(IllegalArgumentException e) {
             log.error("Arguments not found. [{}]", method.getName());
             throw e;
@@ -143,7 +151,13 @@ public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoin
     }
 
     private boolean isCancelSnapshotTarget(Method method, Object result) {
-        return isPreSnapshotTarget(method) && !isUpdated(result);
+        String transactionId = getCurrentTransactionId();
+        boolean isExistsDiffData = false;
+        if (container.has(transactionId)) {
+            List<AuditTrail> auditTrails = container.get(transactionId);
+            isExistsDiffData = auditTrails.stream().anyMatch(auditTrail -> auditTrail.isUpdated());
+        }
+        return isPreSnapshotTarget(method) && (!isUpdated(result) || !isExistsDiffData);
     }
 
     private boolean isTargetReturnType(Object returnType) {

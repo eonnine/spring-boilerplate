@@ -1,5 +1,6 @@
 package com.lims.api.audit.aop;
 
+import com.lims.api.audit.service.AuditTrailConfigurer;
 import com.lims.api.audit.service.impl.*;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -14,12 +15,16 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Component
 public class AuditTrailAspect {
 
+    private final AuditTrailConfigurer configurer;
     private final AuditContainer container;
     private final AuditRepository repository;
+    private final AuditEventPublisher eventPublisher;
 
-    public AuditTrailAspect(AuditContainer container, AuditRepository repository) {
+    public AuditTrailAspect(AuditTrailConfigurer configurer, AuditContainer container, AuditRepository repository, AuditEventPublisher eventPublisher) {
+        this.configurer = configurer;
         this.container = container;
         this.repository = repository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Pointcut("execution(* com.lims.api..dao.*.*(..))")
@@ -33,25 +38,19 @@ public class AuditTrailAspect {
 
     @Around("repositoryPoint() && annotationPoint()")
     public Object processing(ProceedingJoinPoint joinPoint) throws Throwable {
-        ProceedingJoinPoint auditJoinPoint = new AnnotationAuditJoinPoint(joinPoint, container, repository);
+        ProceedingJoinPoint auditJoinPoint = new AnnotationAuditJoinPoint(joinPoint, configurer, container, repository);
         return auditJoinPoint.proceed();
     }
 
     @Before("servicePoint()")
     public void transactionListener(JoinPoint joinPoint) throws Throwable {
-        TransactionSynchronizationManager.registerSynchronization(new AuditTransactionListener(container, repository));
+        TransactionSynchronizationManager.registerSynchronization(new AuditTransactionListener(container, eventPublisher));
     }
 
     /**
      * TODO
      * - 예외 처리
      * 예외 발생시 예외가 발생한 Dao & method name 출력
-     *
-     * - option 설정
-     * 1. grouping이면 store에 그룹핑
-     *  -> grouping이면 병합해서 insert
-     *  -> no grouping이면 row별로 insert
-     *
      *
      * 3. camel <-> snake
      */
