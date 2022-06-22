@@ -3,7 +3,7 @@ package com.lims.api.audit.service.impl;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class OracleSqlGenerator extends AbstractSqlGenerator {
+public class OracleAuditSqlGenerator extends AbstractSqlGenerator {
 
     private final String commentQuery = "SELECT LISTAGG(DISTINCT COMMENTS, ',') FROM ALL_COL_COMMENTS WHERE UPPER(TABLE_NAME) = UPPER('%s') AND UPPER(COLUMN_NAME) = UPPER('%s')";
 

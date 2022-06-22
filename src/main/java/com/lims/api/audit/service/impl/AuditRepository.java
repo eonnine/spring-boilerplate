@@ -6,7 +6,6 @@ import com.lims.api.audit.domain.SqlRow;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.PatternMatchUtils;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -29,7 +28,7 @@ public class AuditRepository {
     }
 
     @Transactional
-    public List<SqlRow> findAllById(SqlProvider sqlProvider, Object[] parameters) throws SQLException {
+    public List<SqlRow> findAllById(AuditSqlProvider sqlProvider, Object[] parameters) throws SQLException {
         List<SqlParameter> sqlParameters = sqlProvider.getSqlParameter(parameters);
         String sql = sqlProvider.generateSelectSql(sqlParameters);
         PreparedStatement statement = getConnection().prepareStatement(sql);

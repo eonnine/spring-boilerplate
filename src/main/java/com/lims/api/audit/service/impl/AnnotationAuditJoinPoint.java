@@ -7,7 +7,7 @@ import com.lims.api.audit.domain.AuditTrail;
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlRow;
 import com.lims.api.audit.service.AuditTrailConfigurer;
-import com.lims.api.audit.service.SqlGenerator;
+import com.lims.api.audit.service.AuditSqlGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -105,8 +105,8 @@ public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoin
             entity.setTarget(entityClazz);
             entity.setIdFields(getIdFields(entityClazz));
 
-            SqlGenerator generator = new OracleSqlGenerator(); // TODO 생성 패턴 적용
-            return repository.findAllById(new SqlProvider(generator, entity), parameters);
+            AuditSqlGenerator generator = new OracleAuditSqlGenerator(); // TODO 생성 패턴 적용
+            return repository.findAllById(new AuditSqlProvider(generator, entity), parameters);
         } catch(IllegalArgumentException e) {
             log.error("Arguments not found. [{}]", method.getName());
             throw e;

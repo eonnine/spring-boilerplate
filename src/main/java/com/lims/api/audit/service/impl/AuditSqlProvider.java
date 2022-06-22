@@ -2,7 +2,7 @@ package com.lims.api.audit.service.impl;
 
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlParameter;
-import com.lims.api.audit.service.SqlGenerator;
+import com.lims.api.audit.service.AuditSqlGenerator;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.reflect.Field;
@@ -11,12 +11,12 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class SqlProvider {
+public class AuditSqlProvider {
 
-    private final SqlGenerator generator;
+    private final AuditSqlGenerator generator;
     private final SqlEntity entity;
 
-    public SqlProvider(SqlGenerator generator, SqlEntity entity) {
+    public AuditSqlProvider(AuditSqlGenerator generator, SqlEntity entity) {
         this.generator = generator;
         this.entity = entity;
     }
