@@ -19,9 +19,9 @@ public class AuditRepository {
     private final String commentSuffix = AbstractSqlGenerator.COMMENT_SUFFIX;
 
     private final DataSource dataSource;
-    private final AuditSqlProvider sqlProvider;
+    private final AuditSqlGenerator sqlProvider;
 
-    public AuditRepository(DataSource dataSource, AuditSqlProvider sqlProvider) {
+    public AuditRepository(DataSource dataSource, AuditSqlGenerator sqlProvider) {
         this.dataSource = dataSource;
         this.sqlProvider = sqlProvider;
     }

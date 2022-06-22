@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class AuditSqlProvider {
+public class AuditSqlGenerator {
 
-    private final AuditSqlGenerator generator;
+    private final com.lims.api.audit.service.AuditSqlGenerator generator;
     private final StringConverter converter;
 
-    public AuditSqlProvider(AuditTrailConfigurer configurer, StringConverter converter) {
+    public AuditSqlGenerator(AuditTrailConfigurer configurer, StringConverter converter) {
 //        this.generator = AuditSqlGeneratorFactory.create(configurer.databaseType());
 //        System.out.println(configurer);
         this.generator = new OracleAuditSqlGenerator();
