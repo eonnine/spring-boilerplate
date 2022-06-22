@@ -1,4 +1,4 @@
-package com.lims.api.audit.annotation.config;
+package com.lims.api.audit.config;
 
 import com.lims.api.audit.service.AuditEventListener;
 import com.lims.api.audit.service.AuditTrailConfigurer;
