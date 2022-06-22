@@ -1,8 +1,7 @@
 package com.lims.api.audit.service;
 
-import com.lims.api.audit.domain.AuditRecordStrategy;
-import com.lims.api.audit.domain.ColumnNameConverter;
 import com.lims.api.audit.domain.DisplayType;
+import com.lims.api.audit.domain.StringConvertCase;
 
 public interface AuditTrailConfigurer {
 
@@ -10,8 +9,8 @@ public interface AuditTrailConfigurer {
         return DisplayType.COMMENT;
     };
 
-    default ColumnNameConverter converter() {
-        return null;
+    default StringConvertCase convertCase() {
+        return StringConvertCase.CAMEL_TO_SNAKE;
     };
 
 }

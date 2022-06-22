@@ -26,9 +26,10 @@ import java.util.stream.Collectors;
 public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoint {
 
     private final AuditTrailConfigurer configurer;
-    private final ProceedingJoinPoint target;
     private final AuditContainer container;
     private final AuditRepository repository;
+
+    private final ProceedingJoinPoint target;
 
     public AnnotationAuditJoinPoint(ProceedingJoinPoint joinPoint, AuditTrailConfigurer configurer, AuditContainer container, AuditRepository repository) {
         super((ProxyMethodInvocation) ExposeInvocationInterceptor.currentInvocation());

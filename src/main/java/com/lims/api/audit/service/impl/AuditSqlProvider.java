@@ -3,6 +3,7 @@ package com.lims.api.audit.service.impl;
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlParameter;
 import com.lims.api.audit.service.AuditSqlGenerator;
+import com.lims.api.audit.service.StringConverter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.reflect.Field;
@@ -15,10 +16,12 @@ public class AuditSqlProvider {
 
     private final AuditSqlGenerator generator;
     private final SqlEntity entity;
+    private final StringConverter converter;
 
-    public AuditSqlProvider(AuditSqlGenerator generator, SqlEntity entity) {
+    public AuditSqlProvider(AuditSqlGenerator generator, SqlEntity entity, StringConverter converter) {
         this.generator = generator;
         this.entity = entity;
+        this.converter = converter;
     }
 
     public String generateSelectSql(List<SqlParameter> sqlParameters) {
@@ -42,7 +45,7 @@ public class AuditSqlProvider {
                 parameterField.setAccessible(true);
 
                 SqlParameter sqlParameter = new SqlParameter();
-                sqlParameter.setName(convertCamelToSnakeCase(parameterField.getName()));
+                sqlParameter.setName(converter.convert(parameterField.getName()));
                 sqlParameter.setData(parameterField.get(parameter));
 
                 sqlParameters.add(sqlParameter);
@@ -55,7 +58,7 @@ public class AuditSqlProvider {
 
     private List<String> makeColumnNames(Class<?> clazz) {
         return Arrays.stream(clazz.getDeclaredFields())
-                .map(field -> convertCamelToSnakeCase(field.getName()))
+                .map(field -> converter.convert(field.getName()))
                 .collect(Collectors.toList());
     }
 
@@ -68,11 +71,5 @@ public class AuditSqlProvider {
             return;
         }
         throw new IllegalArgumentException("Not found sql parameters. Parameter is required. [" + TransactionSynchronizationManager.getCurrentTransactionName() + "]");
-    }
-
-    // TODO converter로 의존성 분리 및 다형성
-    private String convertCamelToSnakeCase(String str) {
-        String ret = str.replaceAll("([A-Z])", "_$1").replaceAll("([a-z][A-Z])", "$1_$2");
-        return ret.toLowerCase();
     }
 }
