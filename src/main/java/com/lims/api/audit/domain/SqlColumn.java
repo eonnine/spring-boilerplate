@@ -1,15 +1,15 @@
 package com.lims.api.audit.domain;
 
 public class SqlColumn {
-    private String value;
+    private String data;
     private String comment;
 
-    public String getValue() {
-        return value;
+    public String getData() {
+        return data;
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void setData(String data) {
+        this.data = data;
     }
 
     public String getComment() {

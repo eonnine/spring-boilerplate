@@ -11,7 +11,7 @@
     </select>
 
     <update id="updateMember" parameterType="MemberDto">
-        UPDATE SY_USER SET LAST_CHANGE_DT = TO_DATE('2023-06-20') WHERE LOGIN_ID = #{loginId}
+        UPDATE SY_USER SET LAST_CHANGE_DT = TO_DATE('2017-06-20') WHERE LOGIN_ID = #{loginId}
     </update>
 
     <update id="updateMember2">

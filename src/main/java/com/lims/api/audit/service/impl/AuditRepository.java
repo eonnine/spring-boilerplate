@@ -34,7 +34,7 @@ public class AuditRepository {
         PreparedStatement statement = getConnection().prepareStatement(sql);
 
         for (int i=0; i < sqlParameters.size(); i++) {
-            statement.setString(i + 1, String.valueOf(sqlParameters.get(i).getValue()));
+            statement.setString(i + 1, String.valueOf(sqlParameters.get(i).getData()));
         }
 
         List<SqlRow> result = new ArrayList<>();
@@ -53,9 +53,7 @@ public class AuditRepository {
                 }
 
                 SqlColumn column = new SqlColumn();
-                column.setValue(resultSet.getString(columnLabel));
-                System.out.println(columnLabel);
-                System.out.println(columnLabel + commentSuffix);
+                column.setData(resultSet.getString(columnLabel));
                 column.setComment(resultSet.getString(columnLabel + commentSuffix));
 
                 row.put(metaData.getColumnName(i), column);

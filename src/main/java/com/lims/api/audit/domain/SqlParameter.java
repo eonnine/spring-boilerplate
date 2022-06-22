@@ -2,7 +2,7 @@ package com.lims.api.audit.domain;
 
 public class SqlParameter {
     private String name;
-    private Object value;
+    private Object data;
 
     public SqlParameter() {}
 
@@ -10,15 +10,15 @@ public class SqlParameter {
         return name;
     }
 
-    public Object getValue() {
-        return value;
-    }
-
     public void setName(String name) {
         this.name = name;
     }
 
-    public void setValue(Object value) {
-        this.value = value;
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 }

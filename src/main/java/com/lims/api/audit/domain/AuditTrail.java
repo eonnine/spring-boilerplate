@@ -38,7 +38,7 @@ public class AuditTrail {
                             return false;
                         }
                         SqlColumn updatedColumn = updatedRow.get(key);
-                        return equalsValue(updatedColumn.getValue(), originColumn.getValue());
+                        return equalsValue(updatedColumn.getData(), originColumn.getData());
                     });
 
             if (!isSame) {
@@ -64,12 +64,12 @@ public class AuditTrail {
                             return false;
                         }
                         SqlColumn updatedColumn = updatedRow.get(key);
-                        return notEqualsValue(updatedColumn.getValue(), originColumn.getValue());
+                        return notEqualsValue(updatedColumn.getData(), originColumn.getData());
                     })
                     .map(origin -> "{ "
                             + getColumnLabel(displayType, origin.getValue()) + ": "
-                            + "[" + origin.getValue() + "] -> "
-                            + "[" + updatedRow.get(origin.getKey()) + "]"
+                            + "[" + origin.getValue().getData() + "] -> "
+                            + "[" + updatedRow.get(origin.getKey()).getData() + "]"
                             + " }")
                     .collect(Collectors.joining(", "));
 
@@ -80,10 +80,10 @@ public class AuditTrail {
 
     private String getColumnLabel(DisplayType displayType, SqlColumn column) {
         if (displayType.isColumn()) {
-            return column.getValue();
+            return column.getData();
         }
         else if (displayType.isComment()) {
-            return StringUtils.isEmpty(column.getComment()) ? column.getValue() : column.getComment();
+            return StringUtils.isEmpty(column.getComment()) ? column.getData() : column.getComment();
         }
         return "";
     }

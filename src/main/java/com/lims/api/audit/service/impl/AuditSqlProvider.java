@@ -43,7 +43,7 @@ public class AuditSqlProvider {
 
                 SqlParameter sqlParameter = new SqlParameter();
                 sqlParameter.setName(convertCamelToSnakeCase(parameterField.getName()));
-                sqlParameter.setValue(parameterField.get(parameter));
+                sqlParameter.setData(parameterField.get(parameter));
 
                 sqlParameters.add(sqlParameter);
             }
