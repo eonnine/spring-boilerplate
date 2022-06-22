@@ -1,6 +1,7 @@
 package com.lims.api.audit.service.impl;
 
 import com.lims.api.audit.domain.SqlColumn;
+import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlParameter;
 import com.lims.api.audit.domain.SqlRow;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -15,12 +16,14 @@ import java.util.List;
 @Component
 public class AuditRepository {
 
-    private final DataSource dataSource;
-
     private final String commentSuffix = AbstractSqlGenerator.COMMENT_SUFFIX;
 
-    public AuditRepository(DataSource dataSource) {
+    private final DataSource dataSource;
+    private final AuditSqlProvider sqlProvider;
+
+    public AuditRepository(DataSource dataSource, AuditSqlProvider sqlProvider) {
         this.dataSource = dataSource;
+        this.sqlProvider = sqlProvider;
     }
 
     private Connection getConnection() {
@@ -28,9 +31,10 @@ public class AuditRepository {
     }
 
     @Transactional
-    public List<SqlRow> findAllById(AuditSqlProvider sqlProvider, Object[] parameters) throws SQLException {
-        List<SqlParameter> sqlParameters = sqlProvider.getSqlParameter(parameters);
-        String sql = sqlProvider.generateSelectSql(sqlParameters);
+    public List<SqlRow> findAllById(SqlEntity entity, Object[] parameters) throws SQLException {
+        List<SqlParameter> sqlParameters = sqlProvider.getSqlParameter(entity, parameters);
+        String sql = sqlProvider.generateSelectSql(entity, sqlParameters);
+
         PreparedStatement statement = getConnection().prepareStatement(sql);
 
         for (int i=0; i < sqlParameters.size(); i++) {

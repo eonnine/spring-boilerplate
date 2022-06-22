@@ -1,6 +1,5 @@
 package com.lims.api.audit.aop;
 
-import com.lims.api.audit.service.AuditTrailConfigurer;
 import com.lims.api.audit.service.impl.*;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -15,13 +14,11 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 @Component
 public class AuditTrailAspect {
 
-    private final AuditTrailConfigurer configurer;
     private final AuditContainer container;
     private final AuditRepository repository;
     private final AuditEventPublisher eventPublisher;
 
-    public AuditTrailAspect(AuditTrailConfigurer configurer, AuditContainer container, AuditRepository repository, AuditEventPublisher eventPublisher) {
-        this.configurer = configurer;
+    public AuditTrailAspect(AuditContainer container, AuditRepository repository, AuditEventPublisher eventPublisher) {
         this.container = container;
         this.repository = repository;
         this.eventPublisher = eventPublisher;
@@ -38,7 +35,7 @@ public class AuditTrailAspect {
 
     @Around("repositoryPoint() && annotationPoint()")
     public Object processing(ProceedingJoinPoint joinPoint) throws Throwable {
-        ProceedingJoinPoint auditJoinPoint = new AnnotationAuditJoinPoint(joinPoint, configurer, container, repository);
+        ProceedingJoinPoint auditJoinPoint = new AnnotationAuditJoinPoint(joinPoint, container, repository);
         return auditJoinPoint.proceed();
     }
 
@@ -46,12 +43,4 @@ public class AuditTrailAspect {
     public void transactionListener(JoinPoint joinPoint) throws Throwable {
         TransactionSynchronizationManager.registerSynchronization(new AuditTransactionListener(container, eventPublisher));
     }
-
-    /**
-     * TODO
-     * - 예외 처리
-     * 예외 발생시 예외가 발생한 Dao & method name 출력
-     *
-     * 3. camel <-> snake
-     */
 }

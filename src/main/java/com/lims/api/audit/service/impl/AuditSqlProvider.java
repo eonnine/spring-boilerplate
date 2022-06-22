@@ -3,7 +3,9 @@ package com.lims.api.audit.service.impl;
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlParameter;
 import com.lims.api.audit.service.AuditSqlGenerator;
+import com.lims.api.audit.service.AuditTrailConfigurer;
 import com.lims.api.audit.service.StringConverter;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.reflect.Field;
@@ -12,26 +14,27 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 public class AuditSqlProvider {
 
     private final AuditSqlGenerator generator;
-    private final SqlEntity entity;
     private final StringConverter converter;
 
-    public AuditSqlProvider(AuditSqlGenerator generator, SqlEntity entity, StringConverter converter) {
-        this.generator = generator;
-        this.entity = entity;
+    public AuditSqlProvider(AuditTrailConfigurer configurer, StringConverter converter) {
+//        this.generator = AuditSqlGeneratorFactory.create(configurer.databaseType());
+//        System.out.println(configurer);
+        this.generator = new OracleAuditSqlGenerator();
         this.converter = converter;
     }
 
-    public String generateSelectSql(List<SqlParameter> sqlParameters) {
+    public String generateSelectSql(SqlEntity entity, List<SqlParameter> sqlParameters) {
         List<String> columnNames = makeColumnNames(entity.getTarget());
         String tableName = entity.getName();
         String conditions = makeConditions(sqlParameters);
         return generator.makeSelectSqlWithComment(columnNames, tableName, conditions);
     }
 
-    public List<SqlParameter> getSqlParameter(Object[] parameters) {
+    public List<SqlParameter> getSqlParameter(SqlEntity entity, Object[] parameters) {
         assertExistsParameter(parameters);
 
         Object parameter = parameters[0];

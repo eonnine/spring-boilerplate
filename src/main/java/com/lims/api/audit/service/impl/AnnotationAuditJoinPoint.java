@@ -6,8 +6,6 @@ import com.lims.api.audit.annotation.AuditId;
 import com.lims.api.audit.domain.AuditTrail;
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlRow;
-import com.lims.api.audit.service.AuditTrailConfigurer;
-import com.lims.api.audit.service.AuditSqlGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -25,16 +23,14 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoint {
 
-    private final AuditTrailConfigurer configurer;
     private final AuditContainer container;
     private final AuditRepository repository;
 
     private final ProceedingJoinPoint target;
 
-    public AnnotationAuditJoinPoint(ProceedingJoinPoint joinPoint, AuditTrailConfigurer configurer, AuditContainer container, AuditRepository repository) {
+    public AnnotationAuditJoinPoint(ProceedingJoinPoint joinPoint, AuditContainer container, AuditRepository repository) {
         super((ProxyMethodInvocation) ExposeInvocationInterceptor.currentInvocation());
         this.target = joinPoint;
-        this.configurer = configurer;
         this.container = container;
         this.repository = repository;
     }
@@ -106,8 +102,7 @@ public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoin
             entity.setTarget(entityClazz);
             entity.setIdFields(getIdFields(entityClazz));
 
-            AuditSqlGenerator generator = new OracleAuditSqlGenerator(); // TODO 생성 패턴 적용
-            return repository.findAllById(new AuditSqlProvider(generator, entity), parameters);
+            return repository.findAllById(entity, parameters);
         } catch(IllegalArgumentException e) {
             log.error("Arguments not found. [{}]", method.getName());
             throw e;
