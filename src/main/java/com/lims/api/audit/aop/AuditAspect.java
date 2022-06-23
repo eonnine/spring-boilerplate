@@ -9,11 +9,11 @@ import org.aspectj.lang.annotation.Pointcut;
 
 //@Aspect
 //@Component
-public class AuditTrailAspect {
+public class AuditAspect {
     private final AuditContainer container;
     private final AuditSqlRepository repository;
 
-    public AuditTrailAspect(AuditContainer container, AuditSqlRepository repository) {
+    public AuditAspect(AuditContainer container, AuditSqlRepository repository) {
         this.container = container;
         this.repository = repository;
     }

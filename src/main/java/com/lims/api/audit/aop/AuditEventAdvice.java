@@ -7,12 +7,12 @@ import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-public class AuditTrailEventAdvice implements MethodInterceptor {
+public class AuditEventAdvice implements MethodInterceptor {
 
     private final AuditContainer container;
     private final AuditEventPublisher eventPublisher;
 
-    public AuditTrailEventAdvice(AuditContainer container, AuditEventPublisher eventPublisher) {
+    public AuditEventAdvice(AuditContainer container, AuditEventPublisher eventPublisher) {
         this.container = container;
         this.eventPublisher = eventPublisher;
     }

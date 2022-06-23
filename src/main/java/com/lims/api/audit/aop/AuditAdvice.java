@@ -6,12 +6,12 @@ import com.lims.api.audit.sql.AuditSqlRepository;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
-public class AuditTrailAdvice implements MethodInterceptor {
+public class AuditAdvice implements MethodInterceptor {
 
     private final AuditContainer container;
     private final AuditSqlRepository repository;
 
-    public AuditTrailAdvice(AuditContainer container, AuditSqlRepository repository) {
+    public AuditAdvice(AuditContainer container, AuditSqlRepository repository) {
         this.container = container;
         this.repository = repository;
     }

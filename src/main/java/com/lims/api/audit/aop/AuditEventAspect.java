@@ -9,11 +9,11 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 //@Aspect
 //@Component
-public class AuditTrailEventAspect {
+public class AuditEventAspect {
     private final AuditContainer container;
     private final AuditEventPublisher eventPublisher;
 
-    public AuditTrailEventAspect(AuditContainer container, AuditEventPublisher eventPublisher) {
+    public AuditEventAspect(AuditContainer container, AuditEventPublisher eventPublisher) {
         this.container = container;
         this.eventPublisher = eventPublisher;
     }

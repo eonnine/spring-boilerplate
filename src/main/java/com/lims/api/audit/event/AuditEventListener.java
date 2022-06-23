@@ -1,12 +1,13 @@
 package com.lims.api.audit.event;
 
 import com.lims.api.audit.domain.AuditString;
+import org.springframework.aop.aspectj.AspectJExpressionPointcut;
 
 import java.util.List;
 
 public interface AuditEventListener {
 
-    void pointCut();
+    AspectJExpressionPointcut pointcut();
 
     default void beforeCommit(List<AuditString> auditTrail) {};
 
