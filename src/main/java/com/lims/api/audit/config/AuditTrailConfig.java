@@ -1,9 +1,7 @@
 package com.lims.api.audit.config;
 
-import com.lims.api.audit.service.AuditEventListener;
-import com.lims.api.audit.service.AuditTrailConfigurer;
-import com.lims.api.audit.service.impl.DefaultAuditEventListener;
-import com.lims.api.audit.service.impl.DefaultAuditTrailConfigurer;
+import com.lims.api.audit.event.DefaultAuditEventListener;
+import com.lims.api.audit.event.AuditEventListener;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

@@ -1,6 +1,6 @@
 package com.lims.api.audit.domain;
 
-import com.lims.api.audit.service.AuditTrailConfigurer;
+import com.lims.api.audit.config.AuditTrailConfigurer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;

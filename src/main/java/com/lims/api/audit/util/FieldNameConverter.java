@@ -1,8 +1,7 @@
-package com.lims.api.audit.service.impl;
+package com.lims.api.audit.util;
 
 import com.lims.api.audit.domain.StringConvertCase;
-import com.lims.api.audit.service.AuditTrailConfigurer;
-import com.lims.api.audit.service.StringConverter;
+import com.lims.api.audit.config.AuditTrailConfigurer;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 

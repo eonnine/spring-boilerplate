@@ -1,4 +1,4 @@
-package com.lims.api.audit.service.impl;
+package com.lims.api.audit.context;
 
 import com.lims.api.audit.annotation.Audit;
 import com.lims.api.audit.annotation.AuditEntity;
@@ -6,6 +6,9 @@ import com.lims.api.audit.annotation.AuditId;
 import com.lims.api.audit.domain.AuditTrail;
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlRow;
+import com.lims.api.audit.implementz.AuditContainer;
+import com.lims.api.audit.sql.AuditSqlRepository;
+import com.lims.api.audit.transaction.AuditTransactionManager;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.reflect.MethodSignature;
@@ -15,7 +18,6 @@ import org.springframework.aop.interceptor.ExposeInvocationInterceptor;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,11 +26,11 @@ import java.util.stream.Collectors;
 public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoint {
 
     private final AuditContainer container;
-    private final AuditRepository repository;
+    private final AuditSqlRepository repository;
 
     private final ProceedingJoinPoint target;
 
-    public AnnotationAuditJoinPoint(ProceedingJoinPoint joinPoint, AuditContainer container, AuditRepository repository) {
+    public AnnotationAuditJoinPoint(ProceedingJoinPoint joinPoint, AuditContainer container, AuditSqlRepository repository) {
         super((ProxyMethodInvocation) ExposeInvocationInterceptor.currentInvocation());
         this.target = joinPoint;
         this.container = container;
@@ -58,7 +60,7 @@ public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoin
         return result;
     }
 
-    private void preSnapshot(Method method, Object[] args) throws SQLException, NoSuchFieldException {
+    private void preSnapshot(Method method, Object[] args) {
         Audit auditAnnotation = getAuditAnnotation(method);
         Class<?> entityClazz = getAuditEntity(auditAnnotation);
         List<SqlRow> originData = getCurrentData(entityClazz, method, args);
@@ -72,7 +74,7 @@ public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoin
         container.put(transactionId, auditTrail);
     }
 
-    private void postSnapshot(Method method, Object[] parameters, Object result) throws SQLException, NoSuchFieldException {
+    private void postSnapshot(Method method, Object[] parameters, Object result) {
         Audit auditAnnotation = getAuditAnnotation(method);
         Class<?> entityClazz = getAuditEntity(auditAnnotation);
         List<SqlRow> updatedData = getCurrentData(entityClazz, method, parameters);
@@ -92,7 +94,7 @@ public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoin
         }
     }
 
-    private List<SqlRow> getCurrentData(Class<?> entityClazz, Method method, Object[] parameters) throws SQLException {
+    private List<SqlRow> getCurrentData(Class<?> entityClazz, Method method, Object[] parameters) {
         try {
             AuditEntity entityAnnotation = entityClazz.getAnnotation(AuditEntity.class);
             String tableName = entityAnnotation.name();
@@ -104,8 +106,7 @@ public class AnnotationAuditJoinPoint extends MethodInvocationProceedingJoinPoin
 
             return repository.findAllById(entity, parameters);
         } catch(IllegalArgumentException e) {
-            log.error("Arguments not found. [{}]", method.getName());
-            throw e;
+            throw new RuntimeException("Arguments not found. [" + method.getName() + "] " + e.getMessage(), e.getCause());
         }
     }
 

@@ -1,13 +1,16 @@
 package com.lims.api.config;
 
 import com.lims.api.audit.domain.AuditString;
-import com.lims.api.audit.service.AuditEventListener;
-import org.springframework.context.annotation.Configuration;
+import com.lims.api.audit.event.AuditEventListener;
 
 import java.util.List;
 
-@Configuration
 public class AuditTrailEventListener implements AuditEventListener {
+
+    @Override
+    public void pointCut() {
+
+    }
 
     @Override
     public void beforeCommit(List<AuditString> auditTrail) {

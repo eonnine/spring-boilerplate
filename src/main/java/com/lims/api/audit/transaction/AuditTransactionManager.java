@@ -1,4 +1,4 @@
-package com.lims.api.audit.service.impl;
+package com.lims.api.audit.transaction;
 
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -12,7 +12,7 @@ public class AuditTransactionManager {
         return UUID.randomUUID().toString();
     }
 
-    protected static String initResourceCurrentTransaction() {
+    public static String initResourceCurrentTransaction() {
         if (hasResourceCurrentTransaction()) {
             throw new RuntimeException("Already exists auditTrail resource in current transaction [" + TransactionSynchronizationManager.getCurrentTransactionName() + "]");
         }
@@ -21,20 +21,20 @@ public class AuditTransactionManager {
         return transactionId;
     }
 
-    protected static String getCurrentTransactionId() {
+    public static String getCurrentTransactionId() {
         if (!hasResourceCurrentTransaction()) {
             throw new RuntimeException("Not found current auditTrail resource in current transaction [" + TransactionSynchronizationManager.getCurrentTransactionName() + "]");
         }
         return (String) TransactionSynchronizationManager.getResource(RESOURCE_NAME);
     }
 
-    protected static void removeCurrentTransactionId() {
+    public static void removeCurrentTransactionId() {
         if (hasResourceCurrentTransaction()) {
             TransactionSynchronizationManager.unbindResource(RESOURCE_NAME);
         }
     }
 
-    protected static boolean hasResourceCurrentTransaction() {
+    public static boolean hasResourceCurrentTransaction() {
         return TransactionSynchronizationManager.hasResource(RESOURCE_NAME);
     }
 

@@ -1,4 +1,4 @@
-package com.lims.api.audit.service;
+package com.lims.api.audit.config;
 
 import com.lims.api.audit.domain.DataBaseType;
 import com.lims.api.audit.domain.DisplayType;

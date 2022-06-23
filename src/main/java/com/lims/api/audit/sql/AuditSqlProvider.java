@@ -1,10 +1,8 @@
-package com.lims.api.audit.service.impl;
+package com.lims.api.audit.sql;
 
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlParameter;
-import com.lims.api.audit.service.AuditSqlGenerator;
-import com.lims.api.audit.service.AuditTrailConfigurer;
-import com.lims.api.audit.service.StringConverter;
+import com.lims.api.audit.util.StringConverter;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -15,15 +13,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Component
-public class AuditSqlGenerator {
+public class AuditSqlProvider {
 
-    private final com.lims.api.audit.service.AuditSqlGenerator generator;
+    private final AuditSqlGenerator generator;
     private final StringConverter converter;
 
-    public AuditSqlGenerator(AuditTrailConfigurer configurer, StringConverter converter) {
-//        this.generator = AuditSqlGeneratorFactory.create(configurer.databaseType());
-//        System.out.println(configurer);
-        this.generator = new OracleAuditSqlGenerator();
+    public AuditSqlProvider(AuditSqlGeneratorFactory factory, StringConverter converter) {
+        this.generator = factory.create();
         this.converter = converter;
     }
 
@@ -54,7 +50,7 @@ public class AuditSqlGenerator {
                 sqlParameters.add(sqlParameter);
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Parameter '" + parameterClazz.getName() + "' has not a field matching the id field in the audit entity '" + entity.getName() + "'. [" + e.getMessage() + "]");
+            throw new RuntimeException("Parameter '" + parameterClazz.getName() + "' has not a field matching the id field in the audit entity '" + entity.getName() + "'. [" + e.getMessage() + "]", e.getCause());
         }
         return sqlParameters;
     }

@@ -1,4 +1,4 @@
-package com.lims.api.audit.service;
+package com.lims.api.audit.sql;
 
 import java.util.List;
 

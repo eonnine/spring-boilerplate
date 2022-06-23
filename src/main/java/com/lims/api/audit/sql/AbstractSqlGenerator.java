@@ -1,6 +1,6 @@
-package com.lims.api.audit.service.impl;
+package com.lims.api.audit.sql;
 
-import com.lims.api.audit.service.AuditSqlGenerator;
+import com.lims.api.audit.sql.AuditSqlGenerator;
 
 import java.util.List;
 
