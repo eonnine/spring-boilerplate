@@ -1,4 +1,4 @@
-package com.lims.api.audit.implementz;
+package com.lims.api.audit.context;
 
 import com.lims.api.audit.domain.AuditTrail;
 import org.springframework.stereotype.Component;

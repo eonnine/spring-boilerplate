@@ -1,7 +1,7 @@
 package com.lims.api.audit.transaction;
 
 import com.lims.api.audit.domain.AuditTrail;
-import com.lims.api.audit.implementz.AuditContainer;
+import com.lims.api.audit.context.AuditContainer;
 import com.lims.api.audit.event.AuditEventPublisher;
 import org.springframework.transaction.support.TransactionSynchronization;
 

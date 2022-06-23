@@ -2,7 +2,7 @@ package com.lims.api.audit.config;
 
 import com.lims.api.audit.aop.AuditTrailAdvice;
 import com.lims.api.audit.aop.AuditTrailEventAdvice;
-import com.lims.api.audit.implementz.AuditContainer;
+import com.lims.api.audit.context.AuditContainer;
 import com.lims.api.audit.event.AuditEventPublisher;
 import com.lims.api.audit.sql.AuditSqlRepository;
 import org.springframework.aop.Advisor;

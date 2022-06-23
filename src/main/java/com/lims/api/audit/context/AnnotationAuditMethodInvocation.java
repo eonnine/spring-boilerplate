@@ -6,7 +6,6 @@ import com.lims.api.audit.annotation.AuditId;
 import com.lims.api.audit.domain.AuditTrail;
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlRow;
-import com.lims.api.audit.implementz.AuditContainer;
 import com.lims.api.audit.sql.AuditSqlRepository;
 import com.lims.api.audit.transaction.AuditTransactionManager;
 import lombok.extern.slf4j.Slf4j;
