@@ -1,6 +1,6 @@
 package com.lims.api.audit.util;
 
-import com.lims.api.audit.config.AuditTrailConfigurer;
+import com.lims.api.audit.config.AuditConfigurer;
 import com.lims.api.audit.domain.StringConvertCase;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -15,9 +15,9 @@ import java.util.stream.Collectors;
 public class FieldNameConverter implements StringConverter {
 
     private Map<StringConvertCase, Function<String, String>> converter = new HashMap<>();
-    private final AuditTrailConfigurer configurer;
+    private final AuditConfigurer configurer;
 
-    public FieldNameConverter(AuditTrailConfigurer configurer) {
+    public FieldNameConverter(AuditConfigurer configurer) {
         this.configurer = configurer;
         this.converter = Map.of(
                 StringConvertCase.CAMEL_TO_SNAKE, this::camelToSnake,

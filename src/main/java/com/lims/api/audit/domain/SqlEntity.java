@@ -1,12 +1,12 @@
 package com.lims.api.audit.domain;
 
-import java.lang.reflect.Field;
 import java.util.List;
 
 public class SqlEntity {
     private String name;
     private Class<?> target;
-    private List<Field> idFields;
+    private List<String> idFields;
+    private String selectClause;
 
     public String getName() {
         return name;
@@ -24,11 +24,19 @@ public class SqlEntity {
         this.target = target;
     }
 
-    public List<Field> getIdFields() {
+    public List<String> getIdFields() {
         return idFields;
     }
 
-    public void setIdFields(List<Field> idFields) {
+    public void setIdFields(List<String> idFields) {
         this.idFields = idFields;
+    }
+
+    public String getSelectClause() {
+        return selectClause;
+    }
+
+    public void setSelectClause(String selectClause) {
+        this.selectClause = selectClause;
     }
 }

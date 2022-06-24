@@ -37,7 +37,7 @@ public class MemberController {
 
     @PatchMapping
     public ResponseEntity<Integer> updateMember2() {
-        return ResponseEntity.ok(memberDao.updateMember2("admin"));
+        return ResponseEntity.ok(memberDao.updateMember2(null));
     }
 
     @DeleteMapping

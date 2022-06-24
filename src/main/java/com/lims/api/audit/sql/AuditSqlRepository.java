@@ -20,10 +20,12 @@ public class AuditSqlRepository {
     private final String commentSuffix = AbstractSqlGenerator.COMMENT_SUFFIX;
 
     private final DataSource dataSource;
+    private final AuditSqlManager sqlManager;
     private final AuditSqlProvider sqlProvider;
 
-    public AuditSqlRepository(DataSource dataSource, AuditSqlProvider sqlProvider) {
+    public AuditSqlRepository(DataSource dataSource, AuditSqlManager sqlManager, AuditSqlProvider sqlProvider) {
         this.dataSource = dataSource;
+        this.sqlManager = sqlManager;
         this.sqlProvider = sqlProvider;
     }
 
@@ -32,11 +34,15 @@ public class AuditSqlRepository {
     }
 
     @Transactional
-    public List<SqlRow> findAllById(SqlEntity entity, Object[] parameters) {
-        List<SqlParameter> sqlParameters = sqlProvider.getSqlParameter(entity, parameters);
-        String sql = sqlProvider.generateSelectSql(entity, sqlParameters);
-        List<SqlRow> result = new ArrayList<>();
+    public List<SqlRow> findAllById(Class<?> entityClazz, Object[] parameters) {
+        SqlEntity sqlEntity = sqlManager.get(entityClazz.getName());
 
+        List<SqlParameter> sqlParameters = sqlProvider.getSqlParameter(sqlEntity, parameters);
+        String conditionClause = sqlProvider.makeConditionClause(sqlParameters);
+
+        String sql = sqlEntity.getSelectClause() + conditionClause;
+
+        List<SqlRow> result = new ArrayList<>();
         try {
             PreparedStatement statement = getConnection().prepareStatement(sql);
 

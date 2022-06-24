@@ -1,11 +1,13 @@
 package com.lims.api.config;
 
 import com.lims.api.audit.domain.AuditString;
+import com.lims.api.audit.transaction.AuditEventListener;
+import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
 
-//@Configuration
-public class AuditTrailEventListener implements com.lims.api.audit.transaction.AuditTrailEventListener {
+@Configuration
+public class AuditTrailEventListener implements AuditEventListener {
 
     @Override
     public void beforeCommit(List<AuditString> auditTrail) {
@@ -15,4 +17,5 @@ public class AuditTrailEventListener implements com.lims.api.audit.transaction.A
             System.out.println(auditString.getContent());
         });
     }
+
 }

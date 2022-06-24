@@ -1,26 +1,26 @@
 package com.lims.api.audit.aop;
 
 import com.lims.api.audit.context.AnnotationAuditJoinPoint;
-import com.lims.api.audit.context.AuditContainer;
+import com.lims.api.audit.context.AuditManager;
 import com.lims.api.audit.sql.AuditSqlRepository;
-import com.lims.api.audit.transaction.AuditTrailEventPublisher;
+import com.lims.api.audit.transaction.AuditTransactionListener;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
 
-@Aspect
-@Component
+//@Aspect
+//@Component
 public class AuditAspect {
-    private final AuditContainer container;
+    private final AuditManager container;
     private final AuditSqlRepository repository;
-    private final AuditTrailEventPublisher eventPublisher;
+    private final AuditTransactionListener transactionListener;
 
-    public AuditAspect(AuditContainer container, AuditSqlRepository repository, AuditTrailEventPublisher eventPublisher) {
+    public AuditAspect(AuditManager container, AuditSqlRepository repository, AuditTransactionListener transactionListener) {
         this.container = container;
         this.repository = repository;
-        this.eventPublisher = eventPublisher;
+        this.transactionListener = transactionListener;
     }
 
     @Pointcut("@annotation(com.lims.api.audit.annotation.Audit)")
@@ -28,7 +28,7 @@ public class AuditAspect {
 
     @Around("annotationPoint()")
     public Object processing(ProceedingJoinPoint joinPoint) throws Throwable {
-        ProceedingJoinPoint auditJoinPoint = new AnnotationAuditJoinPoint(joinPoint, container, repository, eventPublisher);
+        ProceedingJoinPoint auditJoinPoint = new AnnotationAuditJoinPoint(joinPoint, container, repository, transactionListener);
         return auditJoinPoint.proceed();
     }
 }

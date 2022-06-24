@@ -7,6 +7,8 @@ import java.util.UUID;
 public class AuditTransactionManager {
 
     private static final String RESOURCE_NAME = "auditTailIdentifier";
+               
+    private AuditTransactionManager() {}
 
     private static String createTransactionId() {
         return UUID.randomUUID().toString();

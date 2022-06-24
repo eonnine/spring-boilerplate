@@ -4,7 +4,7 @@ import com.lims.api.audit.domain.DataBaseType;
 import com.lims.api.audit.domain.DisplayType;
 import com.lims.api.audit.domain.StringConvertCase;
 
-public interface AuditTrailConfigurer {
+public interface AuditConfigurer {
 
     default DisplayType displayType() {
         return DisplayType.COMMENT;

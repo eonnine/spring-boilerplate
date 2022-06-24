@@ -15,7 +15,7 @@ public class RegularMemberService implements MemberService {
     @Override
     public int updateMember(MemberDto dto) {
         int result = memberDao.updateMember(dto);
-//        memberDao.updateMember2("admin");
+        memberDao.updateMember2(dto);
         deleteMember();
         return result;
     }

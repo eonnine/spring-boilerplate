@@ -1,6 +1,6 @@
 package com.lims.api.audit.domain;
 
-import com.lims.api.audit.config.AuditTrailConfigurer;
+import com.lims.api.audit.config.AuditConfigurer;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class AuditTrail {
 
     public AuditTrail() {}
 
-    public AuditString toAuditString(AuditTrailConfigurer configurer) {
+    public AuditString toAuditString(AuditConfigurer configurer) {
         return AuditString.builder()
                 .label(getLabel())
                 .content(getContent())

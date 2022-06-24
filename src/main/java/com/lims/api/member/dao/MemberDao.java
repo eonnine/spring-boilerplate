@@ -18,7 +18,7 @@ public interface MemberDao {
     int updateMember(MemberDto dto);
 
     @Audit(target = Member.class)
-    Integer updateMember2(String id);
+    Integer updateMember2(MemberDto dto);
 
     @Audit(target = Member.class)
     int deleteMember(MemberDto dto);

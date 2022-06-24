@@ -11,11 +11,11 @@
     </select>
 
     <update id="updateMember" parameterType="MemberDto">
-        UPDATE SY_USER SET LAST_CHANGE_DT = TO_DATE('2021-06-23') WHERE LOGIN_ID = #{loginId}
+        UPDATE SY_USER SET LAST_CHANGE_DT = TO_DATE('2018-06-24'), LAST_CHANGER_ID = '11' WHERE LOGIN_ID = #{loginId}
     </update>
 
-    <update id="updateMember2">
-        UPDATE SY_USER SET LAST_CHANGE_DT = SYSDATE WHERE LOGIN_ID = #{value}
+    <update id="updateMember2" parameterType="MemberDto">
+        UPDATE SY_USER SET LAST_CHANGE_DT= TO_DATE('2019-06-26'), LAST_CHANGER_ID = '101' WHERE LOGIN_ID = #{loginId}
     </update>
 
     <delete id="deleteMember">

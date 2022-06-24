@@ -12,6 +12,6 @@ public abstract class AbstractSqlGenerator implements AuditSqlGenerator {
         return str + COMMENT_SUFFIX;
     }
 
-    public abstract String makeSelectSqlWithComment(List<String> columnNames, String tableName, String conditions);
+    public abstract String makeSelectSqlWithComment(List<String> columnNames, String tableName);
 
 }

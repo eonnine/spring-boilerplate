@@ -1,15 +1,15 @@
 package com.lims.api.audit.sql;
 
-import com.lims.api.audit.config.AuditTrailConfigurer;
+import com.lims.api.audit.config.AuditConfigurer;
 import com.lims.api.audit.domain.DataBaseType;
 import org.springframework.stereotype.Component;
 
 @Component
 public class AuditSqlGeneratorFactory {
 
-    private final AuditTrailConfigurer configurer;
+    private final AuditConfigurer configurer;
 
-    public AuditSqlGeneratorFactory(AuditTrailConfigurer configurer) {
+    public AuditSqlGeneratorFactory(AuditConfigurer configurer) {
         this.configurer = configurer;
     }
 

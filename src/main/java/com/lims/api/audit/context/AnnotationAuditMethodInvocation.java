@@ -7,12 +7,10 @@ import com.lims.api.audit.domain.AuditTrail;
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlRow;
 import com.lims.api.audit.sql.AuditSqlRepository;
-import com.lims.api.audit.transaction.AuditTrailEventPublisher;
 import com.lims.api.audit.transaction.AuditTransactionListener;
 import com.lims.api.audit.transaction.AuditTransactionManager;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInvocation;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -26,23 +24,26 @@ public class AnnotationAuditMethodInvocation implements MethodInvocation {
 
     private final MethodInvocation target;
 
-    private final AuditContainer container;
+    private final AuditManager container;
     private final AuditSqlRepository repository;
-    private final AuditTrailEventPublisher eventPublisher;
+    private final AuditTransactionListener transactionListener;
 
-    public AnnotationAuditMethodInvocation(MethodInvocation invocation, AuditContainer container, AuditSqlRepository repository, AuditTrailEventPublisher eventPublisher) {
+    public AnnotationAuditMethodInvocation(MethodInvocation invocation, AuditManager container, AuditSqlRepository repository, AuditTransactionListener transactionListener) {
         this.target = invocation;
         this.container = container;
         this.repository = repository;
-        this.eventPublisher = eventPublisher;
+        this.transactionListener = transactionListener;
     }
 
     @Override
     public Object proceed() throws Throwable {
-        initSynchronizeTransaction();
-
         Method method = getMethod();
         Object[] args = getArguments();
+
+        if (!AuditTransactionManager.isCurrentTransactionActive()) {
+            initSynchronizeTransaction();
+        }
+
         if (isPreSnapshotTarget(method)) {
             preSnapshot(method, args);
         }
@@ -50,7 +51,7 @@ public class AnnotationAuditMethodInvocation implements MethodInvocation {
         Object result = target.proceed();
 
         if (isPostSnapshotTarget(method, result)) {
-            postSnapshot(method, args, result);
+            postSnapshot(method, args);
         }
 
         if (isCancelSnapshotTarget(method, result)) {
@@ -61,16 +62,14 @@ public class AnnotationAuditMethodInvocation implements MethodInvocation {
     }
 
     private void initSynchronizeTransaction() {
-        String transactionId = getCurrentTransactionId();
-        if (!container.has(transactionId)) {
-            TransactionSynchronizationManager.registerSynchronization(new AuditTransactionListener(container, eventPublisher));
-        }
+        AuditTransactionManager.initCurrentTransaction();
+        AuditTransactionManager.bindListener(transactionListener);
     }
 
     private void preSnapshot(Method method, Object[] args) {
         Audit auditAnnotation = getAuditAnnotation(method);
         Class<?> entityClazz = getAuditEntity(auditAnnotation);
-        List<SqlRow> originData = getCurrentData(entityClazz, method, args);
+        List<SqlRow> originData = getCurrentData(entityClazz, args);
 
         AuditTrail auditTrail = new AuditTrail();
         auditTrail.setLabel(auditAnnotation.label());
@@ -81,10 +80,10 @@ public class AnnotationAuditMethodInvocation implements MethodInvocation {
         container.put(transactionId, auditTrail);
     }
 
-    private void postSnapshot(Method method, Object[] parameters, Object result) {
+    private void postSnapshot(Method method, Object[] parameters) {
         Audit auditAnnotation = getAuditAnnotation(method);
         Class<?> entityClazz = getAuditEntity(auditAnnotation);
-        List<SqlRow> updatedData = getCurrentData(entityClazz, method, parameters);
+        List<SqlRow> updatedData = getCurrentData(entityClazz, parameters);
 
         String transactionId = getCurrentTransactionId();
         List<AuditTrail> auditTrails = container.get(transactionId);
@@ -101,20 +100,8 @@ public class AnnotationAuditMethodInvocation implements MethodInvocation {
         }
     }
 
-    private List<SqlRow> getCurrentData(Class<?> entityClazz, Method method, Object[] parameters) {
-        try {
-            AuditEntity entityAnnotation = entityClazz.getAnnotation(AuditEntity.class);
-            String tableName = entityAnnotation.name();
-
-            SqlEntity entity = new SqlEntity();
-            entity.setName(tableName);
-            entity.setTarget(entityClazz);
-            entity.setIdFields(getIdFields(entityClazz));
-
-            return repository.findAllById(entity, parameters);
-        } catch(IllegalArgumentException e) {
-            throw new RuntimeException("Arguments not found. [" + method.getName() + "] " + e.getMessage(), e.getCause());
-        }
+    private List<SqlRow> getCurrentData(Class<?> entityClazz, Object[] parameters) {
+        return repository.findAllById(entityClazz, parameters);
     }
 
     private List<Field> getIdFields(Class<?> entityClazz) {

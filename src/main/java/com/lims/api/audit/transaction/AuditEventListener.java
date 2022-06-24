@@ -4,10 +4,10 @@ import com.lims.api.audit.domain.AuditString;
 
 import java.util.List;
 
-public interface AuditTrailEventListener {
+public interface AuditEventListener {
 
     default void beforeCommit(List<AuditString> auditTrail) {};
 
-    default void afterCompletion(List<AuditString> auditTrail) {};
+    default void afterCommit(List<AuditString> auditTrail) {};
 
 }

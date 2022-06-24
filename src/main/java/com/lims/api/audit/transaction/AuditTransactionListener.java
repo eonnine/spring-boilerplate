@@ -1,31 +1,37 @@
 package com.lims.api.audit.transaction;
 
-import com.lims.api.audit.context.AuditContainer;
+import com.lims.api.audit.context.AuditManager;
 import com.lims.api.audit.domain.AuditTrail;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 
+@Component
 public class AuditTransactionListener implements TransactionSynchronization {
 
-    private final AuditContainer container;
-    private final AuditTrailEventPublisher eventPublisher;
+    private final AuditManager container;
+    private final AuditEventPublisher eventPublisher;
 
-    public AuditTransactionListener(AuditContainer container, AuditTrailEventPublisher eventPublisher) {
+    public AuditTransactionListener(AuditManager container, AuditEventPublisher eventPublisher) {
         this.container = container;
         this.eventPublisher = eventPublisher;
     }
 
     @Override
     public void beforeCommit(boolean readOnly) {
-        System.out.println(TransactionSynchronizationManager.getSynchronizations());
         if (!AuditTransactionManager.isCurrentTransactionActive()) {
             return;
         }
+        eventPublisher.publishBeforeCommit(getAuditList());
+    }
 
-        List<AuditTrail> auditTrails =  container.get(AuditTransactionManager.getCurrentTransactionId());
-        eventPublisher.publishBeforeCommit(auditTrails);
+    @Override
+    public void afterCommit() {
+        if (!AuditTransactionManager.isCurrentTransactionActive()) {
+            return;
+        }
+        eventPublisher.publishAfterCommit(getAuditList());
     }
 
     @Override
@@ -37,6 +43,10 @@ public class AuditTransactionListener implements TransactionSynchronization {
         String transactionId = AuditTransactionManager.getCurrentTransactionId();
         container.remove(transactionId);
         AuditTransactionManager.removeCurrentTransactionId();
+    }
+
+    private List<AuditTrail> getAuditList() {
+        return container.get(AuditTransactionManager.getCurrentTransactionId());
     }
 
 }

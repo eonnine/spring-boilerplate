@@ -15,5 +15,6 @@ public class Member {
     private String userNm;
     private String password;
     private String lastChangeDt;
+    private String lastChangerId;
 
 }

@@ -1,5 +1,6 @@
 package com.lims.api.audit.sql;
 
+import com.lims.api.audit.annotation.AuditId;
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlParameter;
 import com.lims.api.audit.util.StringConverter;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @Component
 public class AuditSqlProvider {
 
+    private final String conditionOperator = " WHERE ";
     private final AuditSqlGenerator generator;
     private final StringConverter converter;
 
@@ -23,11 +25,15 @@ public class AuditSqlProvider {
         this.converter = converter;
     }
 
-    public String generateSelectSql(SqlEntity entity, List<SqlParameter> sqlParameters) {
-        List<String> columnNames = makeColumnNames(entity.getTarget());
-        String tableName = entity.getName();
-        String conditions = makeConditions(sqlParameters);
-        return generator.makeSelectSqlWithComment(columnNames, tableName, conditions);
+    public String generateSelectClause(Class<?> clazz, String tableName) {
+        List<String> columnNames = makeColumnNames(clazz);
+        return generator.makeSelectSqlWithComment(columnNames, tableName);
+    }
+
+    public String makeConditionClause(List<SqlParameter> sqlParameters) {
+        return conditionOperator + sqlParameters.stream()
+                .map(p -> p.getName() + " = ?")
+                .collect(Collectors.joining(" AND "));
     }
 
     public List<SqlParameter> getSqlParameter(SqlEntity entity, Object[] parameters) {
@@ -35,12 +41,16 @@ public class AuditSqlProvider {
 
         Object parameter = parameters[0];
         Class<?> parameterClazz = parameter.getClass();
-        List<Field> idFields = entity.getIdFields();
+        List<String> parameterFields = List.of(parameterClazz.getDeclaredFields()).stream()
+                .map(f -> f.getName())
+                .collect(Collectors.toList());
+
+        List<String> idFields = getParameterFields(entity.getIdFields(), parameterFields);
         List<SqlParameter> sqlParameters = new ArrayList<>();
 
         try {
-            for (Field field : idFields) {
-                Field parameterField = parameterClazz.getDeclaredField(field.getName());
+            for (String fieldName : idFields) {
+                Field parameterField = parameterClazz.getDeclaredField(fieldName);
                 parameterField.setAccessible(true);
 
                 SqlParameter sqlParameter = new SqlParameter();
@@ -50,19 +60,33 @@ public class AuditSqlProvider {
                 sqlParameters.add(sqlParameter);
             }
         } catch (NoSuchFieldException | IllegalAccessException e) {
-            throw new RuntimeException("Parameter '" + parameterClazz.getName() + "' has not a field matching the id field in the audit entity '" + entity.getName() + "'. [" + e.getMessage() + "]", e.getCause());
+            throw new RuntimeException("Parameter '" + parameterClazz.getName() + "' has not a field matching the id field in the audit entity. '" + entity.getName() + "' [" + e.getMessage() + "]", e.getCause());
         }
         return sqlParameters;
+    }
+
+    private List<String> getParameterFields(List<String> idFields, List<String> parameterFields) {
+        List<String> filterdFields = idFields.stream().filter(s -> parameterFields.contains(s)).collect(Collectors.toList());
+        boolean isSameFields = idFields.size() == filterdFields.size();
+        return isSameFields ? idFields : filterdFields;
+    }
+
+    public List<String> getIdFields(Class<?> clazz) {
+        List<String> ids = Arrays.stream(clazz.getDeclaredFields())
+                .filter(field -> field.isAnnotationPresent(AuditId.class))
+                .map(field -> field.getName())
+                .collect(Collectors.toList());
+
+        if (ids.isEmpty()) {
+            throw new RuntimeException("There is no field with 'AuditId' annotation in the '" + clazz.getSimpleName() + "'. [" + clazz.getName() + "]");
+        }
+        return ids;
     }
 
     private List<String> makeColumnNames(Class<?> clazz) {
         return Arrays.stream(clazz.getDeclaredFields())
                 .map(field -> converter.convert(field.getName()))
                 .collect(Collectors.toList());
-    }
-
-    private String makeConditions(List<SqlParameter> sqlParameters) {
-        return sqlParameters.stream().map(k -> k.getName() + " = ?").collect(Collectors.joining(" AND "));
     }
 
     private void assertExistsParameter(Object[] parameters) {
