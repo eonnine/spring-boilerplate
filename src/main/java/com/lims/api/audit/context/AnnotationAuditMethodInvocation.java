@@ -2,9 +2,7 @@ package com.lims.api.audit.context;
 
 import com.lims.api.audit.annotation.Audit;
 import com.lims.api.audit.annotation.AuditEntity;
-import com.lims.api.audit.annotation.AuditId;
 import com.lims.api.audit.domain.AuditTrail;
-import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlRow;
 import com.lims.api.audit.sql.AuditSqlRepository;
 import com.lims.api.audit.transaction.AuditTransactionListener;
@@ -13,11 +11,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInvocation;
 
 import java.lang.reflect.AccessibleObject;
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class AnnotationAuditMethodInvocation implements MethodInvocation {
@@ -86,33 +81,19 @@ public class AnnotationAuditMethodInvocation implements MethodInvocation {
         List<SqlRow> updatedData = getCurrentData(entityClazz, parameters);
 
         String transactionId = getCurrentTransactionId();
-        List<AuditTrail> auditTrails = container.get(transactionId);
-
-        AuditTrail auditTrail = auditTrails.get(auditTrails.size() - 1);
+        AuditTrail auditTrail = container.getValueLast(transactionId);
         auditTrail.setUpdatedRows(updatedData);
     }
 
     private void cancelSnapshot() {
         String transactionId = getCurrentTransactionId();
         if (container.has(transactionId)) {
-            List<AuditTrail> auditTrails = container.get(transactionId);
-            auditTrails.remove(auditTrails.size() - 1);
+            container.removeValueLast(transactionId);
         }
     }
 
     private List<SqlRow> getCurrentData(Class<?> entityClazz, Object[] parameters) {
         return repository.findAllById(entityClazz, parameters);
-    }
-
-    private List<Field> getIdFields(Class<?> entityClazz) {
-        List<Field> ids = Arrays.stream(entityClazz.getDeclaredFields())
-                .filter(field -> field.isAnnotationPresent(AuditId.class))
-                .collect(Collectors.toList());
-
-        if (ids.isEmpty()) {
-            throw new RuntimeException("There is no field with 'AuditId' annotation in the '" + entityClazz.getSimpleName() + "'. [" + entityClazz.getName() + "]");
-        }
-        return ids;
     }
 
     private String getCurrentTransactionId() {

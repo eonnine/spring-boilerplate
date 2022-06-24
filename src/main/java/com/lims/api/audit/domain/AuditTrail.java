@@ -67,7 +67,7 @@ public class AuditTrail {
                         return notEqualsValue(updatedColumn.getData(), originColumn.getData());
                     })
                     .map(origin -> "{ "
-                            + getColumnLabel(displayType, origin.getValue()) + ": "
+                            + getColumnLabel(displayType, origin.getKey(), origin.getValue()) + ": "
                             + "[" + origin.getValue().getData() + "] -> "
                             + "[" + updatedRow.get(origin.getKey()).getData() + "]"
                             + " }")
@@ -78,12 +78,12 @@ public class AuditTrail {
         return String.join(" / ", result);
     }
 
-    private String getColumnLabel(DisplayType displayType, SqlColumn column) {
+    private String getColumnLabel(DisplayType displayType, String name, SqlColumn column) {
         if (displayType.isColumn()) {
-            return column.getData();
+            return name;
         }
         else if (displayType.isComment()) {
-            return StringUtils.isEmpty(column.getComment()) ? column.getData() : column.getComment();
+            return StringUtils.isEmpty(column.getComment()) ? name : column.getComment();
         }
         return "";
     }

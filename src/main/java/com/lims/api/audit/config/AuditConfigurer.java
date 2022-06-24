@@ -8,11 +8,11 @@ public interface AuditConfigurer {
 
     default DisplayType displayType() {
         return DisplayType.COMMENT;
-    };
+    }
 
     default StringConvertCase convertCase() {
         return StringConvertCase.CAMEL_TO_SNAKE;
-    };
+    }
 
     default DataBaseType databaseType() {
         return DataBaseType.ORACLE;

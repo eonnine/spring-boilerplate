@@ -1,6 +1,5 @@
-package com.lims.api.audit.config;
+package com.lims.api.audit.aop;
 
-import com.lims.api.audit.aop.AuditAdvice;
 import com.lims.api.audit.context.AuditManager;
 import com.lims.api.audit.sql.AuditSqlRepository;
 import com.lims.api.audit.transaction.AuditTransactionListener;
@@ -11,13 +10,13 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class AuditAdvisorConfig {
+public class AuditAdvisor {
 
     private final AuditManager container;
     private final AuditSqlRepository repository;
     private final AuditTransactionListener transactionListener;
 
-    public AuditAdvisorConfig(AuditManager container, AuditSqlRepository repository, AuditTransactionListener transactionListener) {
+    public AuditAdvisor(AuditManager container, AuditSqlRepository repository, AuditTransactionListener transactionListener) {
         this.container = container;
         this.repository = repository;
         this.transactionListener = transactionListener;

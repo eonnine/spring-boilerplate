@@ -9,10 +9,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class AuditConfig {
 
+    private final AuditProperties auditProperties;
+
+    public AuditConfig(AuditProperties auditProperties) {
+        this.auditProperties = auditProperties;
+    }
+
     @Bean
     @ConditionalOnMissingBean
     public AuditConfigurer auditTrailConfigurer() {
-        return new DefaultAuditConfigurer();
+        return new DefaultAuditConfigurer(auditProperties);
     }
 
     @Bean

@@ -4,9 +4,7 @@ import com.lims.api.audit.domain.AuditTrail;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
@@ -26,10 +24,26 @@ public class AuditManager {
         return has(key) ? audit.get(key) : null;
     }
 
+    public AuditTrail getValueLast(String key) {
+        List<AuditTrail> auditTrails = audit.get(key);
+        if (auditTrails.size() == 0) {
+            return null;
+        }
+        return auditTrails.get(auditTrails.size() - 1);
+    }
+
     public void remove(String key) {
         if (has(key)) {
             audit.remove(key);
         }
+    }
+
+    public void removeValueLast(String key) {
+        List<AuditTrail> auditTrails = audit.get(key);
+        if (auditTrails.size() == 0) {
+            return;
+        }
+        auditTrails.remove(auditTrails.size() - 1);
     }
 
     public boolean has(String key) {

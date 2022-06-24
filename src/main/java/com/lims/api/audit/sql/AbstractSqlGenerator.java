@@ -1,7 +1,5 @@
 package com.lims.api.audit.sql;
 
-import com.lims.api.audit.sql.AuditSqlGenerator;
-
 import java.util.List;
 
 public abstract class AbstractSqlGenerator implements AuditSqlGenerator {

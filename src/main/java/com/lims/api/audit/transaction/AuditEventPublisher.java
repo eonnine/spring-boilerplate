@@ -23,12 +23,10 @@ public class AuditEventPublisher {
     }
 
     public void publishBeforeCommit(List<AuditTrail> auditTrails) {
-        System.out.println(TransactionSynchronizationManager.getSynchronizations());
         eventListener.beforeCommit(convertToAuditString(auditTrails));
     }
 
     public void publishAfterCommit(List<AuditTrail> auditTrails) {
-        System.out.println(TransactionSynchronizationManager.getSynchronizations());
         eventListener.afterCommit(convertToAuditString(auditTrails));
     }
 

@@ -66,9 +66,9 @@ public class AuditSqlProvider {
     }
 
     private List<String> getParameterFields(List<String> idFields, List<String> parameterFields) {
-        List<String> filterdFields = idFields.stream().filter(s -> parameterFields.contains(s)).collect(Collectors.toList());
-        boolean isSameFields = idFields.size() == filterdFields.size();
-        return isSameFields ? idFields : filterdFields;
+        List<String> filteredFields = idFields.stream().filter(s -> parameterFields.contains(s)).collect(Collectors.toList());
+        boolean isSameFields = idFields.size() == filteredFields.size();
+        return isSameFields ? idFields : filteredFields;
     }
 
     public List<String> getIdFields(Class<?> clazz) {

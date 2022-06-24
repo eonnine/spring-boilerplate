@@ -36,7 +36,6 @@ public class AuditSqlRepository {
     @Transactional
     public List<SqlRow> findAllById(Class<?> entityClazz, Object[] parameters) {
         SqlEntity sqlEntity = sqlManager.get(entityClazz.getName());
-
         List<SqlParameter> sqlParameters = sqlProvider.getSqlParameter(sqlEntity, parameters);
         String conditionClause = sqlProvider.makeConditionClause(sqlParameters);
 

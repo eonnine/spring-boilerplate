@@ -1,4 +1,26 @@
 package com.lims.api.config;
 
-public class AuditTrailConfig {
+import com.lims.api.audit.config.AuditConfigurer;
+import com.lims.api.audit.domain.DataBaseType;
+import com.lims.api.audit.domain.DisplayType;
+import com.lims.api.audit.domain.StringConvertCase;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class AuditTrailConfig implements AuditConfigurer {
+
+    @Override
+    public DisplayType displayType() {
+        return DisplayType.COLUMN;
+    }
+
+    @Override
+    public StringConvertCase convertCase() {
+        return AuditConfigurer.super.convertCase();
+    }
+
+    @Override
+    public DataBaseType databaseType() {
+        return AuditConfigurer.super.databaseType();
+    }
 }
