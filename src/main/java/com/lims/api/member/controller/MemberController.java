@@ -30,7 +30,9 @@ public class MemberController {
                 .userId(102)
                 .loginId("admin")
                 .build();
-        return ResponseEntity.ok(memberService.updateMember(dto));
+        int r = memberService.updateMember(dto);
+
+        return ResponseEntity.ok(r);
     }
 
     @PatchMapping

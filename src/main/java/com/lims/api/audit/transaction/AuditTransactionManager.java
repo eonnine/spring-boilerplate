@@ -12,30 +12,43 @@ public class AuditTransactionManager {
         return UUID.randomUUID().toString();
     }
 
-    public static String initResourceCurrentTransaction() {
-        if (hasResourceCurrentTransaction()) {
+    public static void initCurrentTransaction() {
+        if (hasCurrentTransactionResource()) {
             throw new RuntimeException("Already exists auditTrail resource in current transaction [" + TransactionSynchronizationManager.getCurrentTransactionName() + "]");
         }
-        String transactionId = createTransactionId();
-        TransactionSynchronizationManager.bindResource(RESOURCE_NAME, transactionId);
-        return transactionId;
+        if (!TransactionSynchronizationManager.isSynchronizationActive()) {
+            TransactionSynchronizationManager.initSynchronization();
+        }
+        setCurrentTransactionResource(createTransactionId());
     }
 
     public static String getCurrentTransactionId() {
-        if (!hasResourceCurrentTransaction()) {
+        if (!hasCurrentTransactionResource()) {
             throw new RuntimeException("Not found current auditTrail resource in current transaction [" + TransactionSynchronizationManager.getCurrentTransactionName() + "]");
         }
         return (String) TransactionSynchronizationManager.getResource(RESOURCE_NAME);
     }
 
     public static void removeCurrentTransactionId() {
-        if (hasResourceCurrentTransaction()) {
+        if (hasCurrentTransactionResource()) {
             TransactionSynchronizationManager.unbindResource(RESOURCE_NAME);
         }
     }
 
-    public static boolean hasResourceCurrentTransaction() {
+    public static boolean isCurrentTransactionActive() {
+        return hasCurrentTransactionResource();
+    }
+
+    public static void bindListener(AuditTransactionListener listener) {
+        TransactionSynchronizationManager.registerSynchronization(listener);
+    }
+
+    private static boolean hasCurrentTransactionResource() {
         return TransactionSynchronizationManager.hasResource(RESOURCE_NAME);
+    }
+
+    private static void setCurrentTransactionResource(String transactionId) {
+        TransactionSynchronizationManager.bindResource(RESOURCE_NAME, transactionId);
     }
 
 }

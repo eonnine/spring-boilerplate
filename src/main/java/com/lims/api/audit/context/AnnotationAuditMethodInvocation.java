@@ -7,9 +7,12 @@ import com.lims.api.audit.domain.AuditTrail;
 import com.lims.api.audit.domain.SqlEntity;
 import com.lims.api.audit.domain.SqlRow;
 import com.lims.api.audit.sql.AuditSqlRepository;
+import com.lims.api.audit.transaction.AuditTrailEventPublisher;
+import com.lims.api.audit.transaction.AuditTransactionListener;
 import com.lims.api.audit.transaction.AuditTransactionManager;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.Field;
@@ -25,18 +28,21 @@ public class AnnotationAuditMethodInvocation implements MethodInvocation {
 
     private final AuditContainer container;
     private final AuditSqlRepository repository;
+    private final AuditTrailEventPublisher eventPublisher;
 
-    public AnnotationAuditMethodInvocation(MethodInvocation invocation, AuditContainer container, AuditSqlRepository repository) {
+    public AnnotationAuditMethodInvocation(MethodInvocation invocation, AuditContainer container, AuditSqlRepository repository, AuditTrailEventPublisher eventPublisher) {
         this.target = invocation;
         this.container = container;
         this.repository = repository;
+        this.eventPublisher = eventPublisher;
     }
 
     @Override
     public Object proceed() throws Throwable {
+        initSynchronizeTransaction();
+
         Method method = getMethod();
         Object[] args = getArguments();
-
         if (isPreSnapshotTarget(method)) {
             preSnapshot(method, args);
         }
@@ -52,6 +58,13 @@ public class AnnotationAuditMethodInvocation implements MethodInvocation {
         }
 
         return result;
+    }
+
+    private void initSynchronizeTransaction() {
+        String transactionId = getCurrentTransactionId();
+        if (!container.has(transactionId)) {
+            TransactionSynchronizationManager.registerSynchronization(new AuditTransactionListener(container, eventPublisher));
+        }
     }
 
     private void preSnapshot(Method method, Object[] args) {
@@ -116,10 +129,7 @@ public class AnnotationAuditMethodInvocation implements MethodInvocation {
     }
 
     private String getCurrentTransactionId() {
-        if (AuditTransactionManager.hasResourceCurrentTransaction()) {
-            return AuditTransactionManager.getCurrentTransactionId();
-        }
-        return AuditTransactionManager.initResourceCurrentTransaction();
+        return AuditTransactionManager.getCurrentTransactionId();
     }
 
     private Audit getAuditAnnotation(Method method) {

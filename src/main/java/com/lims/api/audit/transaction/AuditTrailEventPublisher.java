@@ -1,8 +1,8 @@
-package com.lims.api.audit.event;
+package com.lims.api.audit.transaction;
 
+import com.lims.api.audit.config.AuditTrailConfigurer;
 import com.lims.api.audit.domain.AuditString;
 import com.lims.api.audit.domain.AuditTrail;
-import com.lims.api.audit.config.AuditTrailConfigurer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
@@ -12,12 +12,12 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component
-public class AuditEventPublisher {
+public class AuditTrailEventPublisher {
 
-    private final AuditEventListener eventListener;
+    private final AuditTrailEventListener eventListener;
     private final AuditTrailConfigurer configurer;
 
-    public AuditEventPublisher(AuditEventListener eventListener, AuditTrailConfigurer configurer) {
+    public AuditTrailEventPublisher(AuditTrailEventListener eventListener, AuditTrailConfigurer configurer) {
         this.eventListener = eventListener;
         this.configurer = configurer;
     }

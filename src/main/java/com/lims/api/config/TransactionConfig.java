@@ -25,15 +25,16 @@ public class TransactionConfig {
 
     @Bean
     public TransactionInterceptor transactionAdvice() {
-        NameMatchTransactionAttributeSource txAttributeSource = new NameMatchTransactionAttributeSource();
         RuleBasedTransactionAttribute txAttribute = new RuleBasedTransactionAttribute();
-
         txAttribute.setRollbackRules(Collections.singletonList(new RollbackRuleAttribute(Exception.class)));
         txAttribute.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
 
         Map<String, TransactionAttribute> txMethods = new HashMap<String, TransactionAttribute>();
         txMethods.put("*", txAttribute);
+
+        NameMatchTransactionAttributeSource txAttributeSource = new NameMatchTransactionAttributeSource();
         txAttributeSource.setNameMap(txMethods);
+
         return new TransactionInterceptor(transactionManager, txAttributeSource);
     }
 
