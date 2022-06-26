@@ -20,7 +20,7 @@ spring:
     livereload:
       enabled: true
   datasource:
-    driver-class-name: oracle.jdbc.driver.OracleDriver
+    driver-class-name: oracle.jdbc.OracleDriver
     url: jdbc:oracle:thin:@203.229.218.221:22221:iit
     username: SL_USER
     password: SLUSER

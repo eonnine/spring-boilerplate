@@ -2,12 +2,12 @@ package com.lims.api.common.service.impl;
 
 import com.lims.api.common.service.LocaleMessageSource;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
-@Log4j2
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class DefaultLocaleMessageSource implements LocaleMessageSource {

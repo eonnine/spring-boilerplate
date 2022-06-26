@@ -11,7 +11,7 @@ import com.lims.api.config.properties.auth.AccessTokenProperties;
 import com.lims.api.config.properties.auth.RefreshTokenProperties;
 import com.lims.api.config.properties.auth.domain.ExpireProperty;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
 
-@Log4j2
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RegularTokenAuthenticationService implements TokenAuthenticationService {

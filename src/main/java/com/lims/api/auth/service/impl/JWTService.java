@@ -7,7 +7,7 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.lims.api.auth.domain.Token;
 import com.lims.api.auth.service.TokenService;
 import com.lims.api.config.properties.auth.TokenProperties;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Optional;
 
-@Log4j2
+@Slf4j
 @Service
 public class JWTService implements TokenService {
 

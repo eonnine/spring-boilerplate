@@ -1,6 +1,5 @@
 package com.lims.api.auth.domain;
 
-import com.lims.api.auth.domain.Token;
 import lombok.Builder;
 import lombok.Getter;
 
