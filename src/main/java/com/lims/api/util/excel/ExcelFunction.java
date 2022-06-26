@@ -1,8 +1,8 @@
 package com.lims.api.util.excel;
 
 @FunctionalInterface
-public interface ExcelFunction<T, U, R> {
+public interface ExcelFunction<T, S, R> {
 
-    public R apply(T t, U u);
+    public R apply(T t, S u);
 
 }

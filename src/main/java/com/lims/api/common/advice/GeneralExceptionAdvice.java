@@ -2,8 +2,8 @@ package com.lims.api.common.advice;
 
 import com.lims.api.common.exception.UnAuthenticatedAccessException;
 import com.lims.api.common.exception.UnAuthenticatedException;
-import com.lims.api.common.service.LocaleMessageSource;
 import com.lims.api.common.model.ErrorResponse;
+import com.lims.api.common.service.LocaleMessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
@@ -28,7 +28,7 @@ public class GeneralExceptionAdvice {
         return new ResponseEntity<>(new ErrorResponse(messageSource.getMessage(e.getMessageCode())), e.getStatus());
     }
 
-    @ExceptionHandler(UnAuthenticatedAccessException.class)
+    @ExceptionHandler
     public ResponseEntity<ErrorResponse> unAuthenticatedAccessExceptionHandler(UnAuthenticatedAccessException e) {
         return new ResponseEntity<>(new ErrorResponse(messageSource.getMessage(e.getMessageCode())), e.getStatus());
     }
@@ -58,7 +58,7 @@ public class GeneralExceptionAdvice {
     @ExceptionHandler
     public ResponseEntity<ErrorResponse> exceptionHandler(Exception e) {
         e.printStackTrace();
-        return new ResponseEntity<>(new ErrorResponse(e.getMessage()), HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new ErrorResponse(messageSource.getMessage("error.default")), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }

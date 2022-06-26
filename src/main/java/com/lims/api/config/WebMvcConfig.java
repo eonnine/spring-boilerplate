@@ -1,6 +1,6 @@
 package com.lims.api.config;
 
-import com.lims.api.config.resolver.AuthTokenArgumentResolver;
+import com.lims.api.common.resolver.AuthTokenArgumentResolver;
 import com.lims.api.config.xss.XssStringConverter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;

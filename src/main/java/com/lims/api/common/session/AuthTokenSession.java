@@ -23,6 +23,10 @@ public class AuthTokenSession {
         session.removeAttribute(accessToken.get());
     }
 
+    public static boolean verify(HttpSession session, Token accessToken, Token refreshToken) {
+        return session != null && existsAndEquals(session, accessToken, refreshToken);
+    }
+
     public static boolean existsAndEquals(HttpSession session, Token accessToken, Token refreshToken) {
         return exists(session, accessToken) && ((String) session.getAttribute(accessToken.get())).equals(refreshToken.get());
     }

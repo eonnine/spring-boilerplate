@@ -48,7 +48,7 @@ public class AuthenticationController {
             throw new UnAuthenticatedException("error.auth.revokedToken");
         }
 
-        boolean validTokenSession = !AuthTokenSession.existsAndEquals(session, token.getAccessToken(), token.getRefreshToken());
+        boolean validTokenSession = !AuthTokenSession.verify(session, token.getAccessToken(), token.getRefreshToken());
 
         if (!validTokenSession) {
             throw new UnAuthenticatedException("error.auth.invalidToken");
@@ -71,9 +71,9 @@ public class AuthenticationController {
             return ResponseEntity.ok().body(new CommonResponse(false, message));
         }
 
-        boolean validTokenSession = AuthTokenSession.existsAndEquals(session, token.getAccessToken(), token.getRefreshToken());
+        boolean validTokenSession = AuthTokenSession.verify(session, token.getAccessToken(), token.getRefreshToken());
         boolean validAccessToken = tokenService.verify(token.getAccessToken());
-
+        
         if (!validTokenSession || !validAccessToken) {
             String message = messageSource.getMessage("error.auth.invalidToken");
             return ResponseEntity.ok().body(new CommonResponse(false, message));

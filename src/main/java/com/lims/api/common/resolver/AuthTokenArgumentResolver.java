@@ -1,4 +1,4 @@
-package com.lims.api.config.resolver;
+package com.lims.api.common.resolver;
 
 import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.service.TokenAuthenticationService;

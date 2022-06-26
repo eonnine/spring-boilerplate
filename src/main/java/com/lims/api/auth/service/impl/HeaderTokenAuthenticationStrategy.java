@@ -1,14 +1,14 @@
 package com.lims.api.auth.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.condition.HeaderTokenStrategyCondition;
+import com.lims.api.auth.domain.AuthToken;
 import com.lims.api.auth.domain.Token;
 import com.lims.api.auth.model.TokenResponse;
 import com.lims.api.auth.service.TokenAuthenticationStrategy;
 import com.lims.api.config.properties.auth.RefreshTokenProperties;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.stereotype.Service;
 import org.springframework.util.PatternMatchUtils;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Log4j2
+@Slf4j
 @Service
 @Conditional(HeaderTokenStrategyCondition.class)
 @RequiredArgsConstructor
