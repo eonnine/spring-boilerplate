@@ -9,7 +9,7 @@ public class AuditTrail {
     private final String content;
     private final String diffString;
     private final Map<String, Object> id;
-    private final Map<String, Object> parameter;
+    private final Map<String, Object> param;
 
     public CommandType getCommandType() {
         return commandType;
@@ -31,17 +31,17 @@ public class AuditTrail {
         return this.id;
     }
 
-    public Map<String, Object> getParameter() {
-        return parameter;
+    public Map<String, Object> getParam() {
+        return param;
     }
 
-    AuditTrail(CommandType commandType, String label, String content, String diffString, Map<String, Object> id, Map<String, Object> parameter) {
+    AuditTrail(CommandType commandType, String label, String content, String diffString, Map<String, Object> id, Map<String, Object> param) {
         this.commandType = commandType;
         this.label = label;
         this.content = content;
         this.diffString = diffString;
         this.id = id;
-        this.parameter = parameter;
+        this.param = param;
     }
 
     public static AuditTrail.AuditTrailBuilder builder() {
@@ -54,7 +54,7 @@ public class AuditTrail {
         private String content;
         private String diffString;
         private Map<String, Object> id;
-        private Map<String, Object> parameter;
+        private Map<String, Object> param;
 
         AuditTrailBuilder() {
         }
@@ -84,13 +84,13 @@ public class AuditTrail {
             return this;
         }
 
-        public AuditTrail.AuditTrailBuilder parameter(Map<String, Object> parameter) {
-            this.parameter = parameter;
+        public AuditTrail.AuditTrailBuilder param(Map<String, Object> param) {
+            this.param = param;
             return this;
         }
 
         public AuditTrail build() {
-            return new AuditTrail(this.commandType, this.label, this.content, this.diffString, this.id, this.parameter);
+            return new AuditTrail(this.commandType, this.label, this.content, this.diffString, this.id, this.param);
         }
     }
 }

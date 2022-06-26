@@ -1,10 +1,8 @@
 package com.lims.api.config;
 
 import com.lims.api.audit.domain.AuditTrail;
-import com.lims.api.audit.transaction.AuditEventListener;
-import com.lims.api.audit.transaction.AuditTransactionManager;
+import com.lims.api.audit.event.AuditEventListener;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import java.util.List;
 

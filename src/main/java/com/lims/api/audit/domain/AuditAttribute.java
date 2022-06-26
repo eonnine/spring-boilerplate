@@ -28,7 +28,7 @@ public class AuditAttribute {
                 .content(getContent())
                 .diffString(getDiffString(configurer.displayType()))
                 .id(getId())
-                .parameter(getParameter())
+                .param(getParameter())
                 .build();
     }
 

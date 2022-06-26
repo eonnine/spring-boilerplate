@@ -3,7 +3,7 @@ package com.lims.api.audit.aop;
 import com.lims.api.audit.context.AnnotationAuditMethodInvocation;
 import com.lims.api.audit.context.AuditManager;
 import com.lims.api.audit.sql.AuditSqlRepository;
-import com.lims.api.audit.transaction.AuditTransactionListener;
+import com.lims.api.audit.event.AuditTransactionListener;
 import com.lims.api.audit.util.AuditAnnotationReader;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;

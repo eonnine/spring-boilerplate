@@ -1,4 +1,4 @@
-package com.lims.api.audit.transaction;
+package com.lims.api.audit.event;
 
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 

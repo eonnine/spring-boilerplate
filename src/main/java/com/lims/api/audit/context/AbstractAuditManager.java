@@ -2,7 +2,7 @@ package com.lims.api.audit.context;
 
 import com.lims.api.audit.domain.AuditAttribute;
 import com.lims.api.audit.domain.AuditTrail;
-import com.lims.api.audit.transaction.AuditTransactionManager;
+import com.lims.api.audit.event.AuditTransactionManager;
 
 import java.util.HashMap;
 import java.util.List;
