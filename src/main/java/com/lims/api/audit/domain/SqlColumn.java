@@ -1,8 +1,8 @@
 package com.lims.api.audit.domain;
 
 public class SqlColumn {
-    private String data;
-    private String comment;
+    private String data = "";
+    private String comment = "";
 
     public String getData() {
         return data;

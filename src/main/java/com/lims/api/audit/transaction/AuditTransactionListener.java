@@ -1,20 +1,25 @@
 package com.lims.api.audit.transaction;
 
+import com.lims.api.audit.config.AuditConfigurer;
 import com.lims.api.audit.context.AuditManager;
+import com.lims.api.audit.domain.AuditAttribute;
 import com.lims.api.audit.domain.AuditTrail;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.support.TransactionSynchronization;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class AuditTransactionListener implements TransactionSynchronization {
 
-    private final AuditManager container;
+    private final AuditConfigurer configurer;
+    private final AuditManager auditManager;
     private final AuditEventPublisher eventPublisher;
 
-    public AuditTransactionListener(AuditManager container, AuditEventPublisher eventPublisher) {
-        this.container = container;
+    public AuditTransactionListener(AuditConfigurer configurer, AuditManager auditManager, AuditEventPublisher eventPublisher) {
+        this.configurer = configurer;
+        this.auditManager = auditManager;
         this.eventPublisher = eventPublisher;
     }
 
@@ -23,7 +28,10 @@ public class AuditTransactionListener implements TransactionSynchronization {
         if (!AuditTransactionManager.isCurrentTransactionActive()) {
             return;
         }
-        eventPublisher.publishBeforeCommit(getAuditList());
+        List<AuditTrail> audits = convertToAudit(auditManager.getAsList());
+        auditManager.putAudits(audits);
+        eventPublisher.publishBeforeCommit(audits);
+        throw new RuntimeException("rollback!");
     }
 
     @Override
@@ -31,7 +39,7 @@ public class AuditTransactionListener implements TransactionSynchronization {
         if (!AuditTransactionManager.isCurrentTransactionActive()) {
             return;
         }
-        eventPublisher.publishAfterCommit(getAuditList());
+        eventPublisher.publishAfterCommit(auditManager.getAudits());
     }
 
     @Override
@@ -40,13 +48,15 @@ public class AuditTransactionListener implements TransactionSynchronization {
     }
 
     private void clear() {
-        String transactionId = AuditTransactionManager.getCurrentTransactionId();
-        container.remove(transactionId);
+        auditManager.remove();
         AuditTransactionManager.removeCurrentTransactionId();
     }
 
-    private List<AuditTrail> getAuditList() {
-        return container.get(AuditTransactionManager.getCurrentTransactionId());
+    private List<AuditTrail> convertToAudit(List<AuditAttribute> attributes) {
+        return attributes.stream()
+                .filter(AuditAttribute::isUpdated)
+                .map(attribute -> attribute.toAuditTail(configurer))
+                .collect(Collectors.toList());
     }
 
 }

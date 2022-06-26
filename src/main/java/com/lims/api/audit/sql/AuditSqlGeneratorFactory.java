@@ -2,9 +2,7 @@ package com.lims.api.audit.sql;
 
 import com.lims.api.audit.config.AuditConfigurer;
 import com.lims.api.audit.domain.DataBaseType;
-import org.springframework.stereotype.Component;
 
-@Component
 public class AuditSqlGeneratorFactory {
 
     private final AuditConfigurer configurer;

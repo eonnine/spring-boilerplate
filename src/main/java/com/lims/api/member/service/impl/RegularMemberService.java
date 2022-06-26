@@ -16,12 +16,18 @@ public class RegularMemberService implements MemberService {
     public int updateMember(MemberDto dto) {
         int result = memberDao.updateMember(dto);
         memberDao.updateMember2(dto);
-        deleteMember();
         return result;
     }
 
-    public int deleteMember() {
-        return memberDao.deleteMember(MemberDto.builder().loginId("1231232123").build());
+    public int insertMember(MemberDto dto) {
+        memberDao.insertMember(dto);
+        dto.setUserId(102);
+        memberDao.updateMember2(dto);
+        return 1;
+    }
+
+    public int deleteMember(int id) {
+        return memberDao.deleteMember(id);
     }
 
 }

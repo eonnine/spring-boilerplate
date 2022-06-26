@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -14,7 +13,7 @@ import java.util.stream.Collectors;
 @Component
 public class FieldNameConverter implements StringConverter {
 
-    private Map<StringConvertCase, Function<String, String>> converter = new HashMap<>();
+    private final Map<StringConvertCase, Function<String, String>> converter;
     private final AuditConfigurer configurer;
 
     public FieldNameConverter(AuditConfigurer configurer) {

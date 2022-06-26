@@ -11,15 +11,25 @@
     </select>
 
     <update id="updateMember" parameterType="MemberDto">
-        UPDATE SY_USER SET LAST_CHANGE_DT = TO_DATE('2018-06-24'), LAST_CHANGER_ID = '12' WHERE LOGIN_ID = #{loginId}
+        UPDATE SY_USER SET LAST_CHANGE_DT = TO_DATE('2019-07-24'), LAST_CHANGER_ID = #{lastChangerId} WHERE USER_ID = #{userId}
     </update>
 
     <update id="updateMember2" parameterType="MemberDto">
-        UPDATE SY_USER SET LAST_CHANGE_DT= TO_DATE('2022-05-22'), LAST_CHANGER_ID = '102' WHERE LOGIN_ID = #{loginId}
+        UPDATE SY_USER SET LAST_CHANGE_DT= TO_DATE('2016-02-22'), LAST_CHANGER_ID = #{lastChangerId} WHERE USER_ID = #{userId}
     </update>
 
     <delete id="deleteMember">
-        DELETE FROM SY_USER WHERE LOGIN_ID = '131231232423423432423'
+        DELETE FROM SY_USER WHERE USER_ID = #{value}
     </delete>
+
+    <insert id="insertMember" parameterType="MemberDto">
+        <selectKey keyProperty="userId" order="BEFORE" resultType="Integer">
+            SELECT '5000' FROM DUAL
+        </selectKey>
+        INSERT INTO SY_USER
+        (USER_ID, LOGIN_ID, DEPT_CODE, USER_NM, LOCK_AT, USE_AT, LAST_CHANGER_ID, LAST_CHANGE_DT)
+        VALUES
+            (#{userId}, #{loginId}, '123', 'test', 0, 'Y', 'admin', SYSDATE)
+    </insert>
 
 </mapper>

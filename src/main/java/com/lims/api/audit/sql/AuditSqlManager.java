@@ -18,8 +18,4 @@ public class AuditSqlManager {
     public SqlEntity get(String name) {
         return sql.get(name);
     }
-
-    public Map<String, SqlEntity> getAll() {
-        return sql;
-    }
 }

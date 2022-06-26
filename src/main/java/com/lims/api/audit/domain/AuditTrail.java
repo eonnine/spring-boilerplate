@@ -1,122 +1,96 @@
 package com.lims.api.audit.domain;
 
-import com.lims.api.audit.config.AuditConfigurer;
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 public class AuditTrail {
-    private String label = "";
-    private String content = "";
-    private List<SqlRow> originRows;
-    private List<SqlRow> updatedRows;
 
-    public AuditTrail() {}
+    private final CommandType commandType;
+    private final String label;
+    private final String content;
+    private final String diffString;
+    private final Map<String, Object> id;
+    private final Map<String, Object> parameter;
 
-    public AuditString toAuditString(AuditConfigurer configurer) {
-        return AuditString.builder()
-                .label(getLabel())
-                .content(getContent())
-                .diffString(getDiffString(configurer.displayType()))
-                .build();
+    public CommandType getCommandType() {
+        return commandType;
     }
 
-    public boolean isUpdated() {
-        boolean isUpdated = false;
-        int limit = originRows.size();
-        for (int i=0; i < limit; i++) {
-            SqlRow originRow = originRows.get(i);
-            SqlRow updatedRow = updatedRows.get(i);
-            boolean isSame = originRow.entrySet().stream()
-                    .allMatch(origin -> {
-                        String key = origin.getKey();
-                        SqlColumn originColumn = origin.getValue();
-
-                        if (!updatedRow.containsKey(key)) {
-                            return false;
-                        }
-                        SqlColumn updatedColumn = updatedRow.get(key);
-                        return equalsValue(updatedColumn.getData(), originColumn.getData());
-                    });
-
-            if (!isSame) {
-                isUpdated = true;
-                break;
-            }
-        }
-        return isUpdated;
+    public String getLabel() {
+        return this.label;
     }
 
-    private String getDiffString(DisplayType displayType) {
-        List<String> result = new ArrayList<>();
-
-        for (int i=0; i < originRows.size(); i++) {
-            SqlRow originRow = originRows.get(i);
-            SqlRow updatedRow = updatedRows.get(i);
-            String rowString = originRow.entrySet().stream()
-                    .filter(origin -> {
-                        String key = origin.getKey();
-                        SqlColumn originColumn = origin.getValue();
-
-                        if (!updatedRow.containsKey(key)) {
-                            return false;
-                        }
-                        SqlColumn updatedColumn = updatedRow.get(key);
-                        return notEqualsValue(updatedColumn.getData(), originColumn.getData());
-                    })
-                    .map(origin -> "{ "
-                            + getColumnLabel(displayType, origin.getKey(), origin.getValue()) + ": "
-                            + "[" + origin.getValue().getData() + "] -> "
-                            + "[" + updatedRow.get(origin.getKey()).getData() + "]"
-                            + " }")
-                    .collect(Collectors.joining(", "));
-
-            result.add(rowString);
-        }
-        return String.join(" / ", result);
+    public String getContent() {
+        return this.content;
     }
 
-    private String getColumnLabel(DisplayType displayType, String name, SqlColumn column) {
-        if (displayType.isColumn()) {
-            return name;
-        }
-        else if (displayType.isComment()) {
-            return StringUtils.isEmpty(column.getComment()) ? name : column.getComment();
-        }
-        return "";
+    public String getDiffString() {
+        return this.diffString;
     }
 
-    private boolean equalsValue(String s, String s2) {
-        return s.equals(s2);
+    public Map<String, Object> getId() {
+        return this.id;
     }
 
-    private boolean notEqualsValue(String s, String s2) {
-        return !s.equals(s2);
+    public Map<String, Object> getParameter() {
+        return parameter;
     }
 
-    private String getLabel() {
-        return label;
-    }
-
-    private String getContent() {
-        return content;
-    }
-
-    public void setLabel(String label) {
+    AuditTrail(CommandType commandType, String label, String content, String diffString, Map<String, Object> id, Map<String, Object> parameter) {
+        this.commandType = commandType;
         this.label = label;
-    }
-
-    public void setContent(String content) {
         this.content = content;
+        this.diffString = diffString;
+        this.id = id;
+        this.parameter = parameter;
     }
 
-    public void setOriginRows(List<SqlRow> originRows) {
-        this.originRows = originRows;
+    public static AuditTrail.AuditTrailBuilder builder() {
+        return new AuditTrail.AuditTrailBuilder();
     }
 
-    public void setUpdatedRows(List<SqlRow> updatedRows) {
-        this.updatedRows = updatedRows;
+    public static class AuditTrailBuilder {
+        private CommandType commandType;
+        private String label;
+        private String content;
+        private String diffString;
+        private Map<String, Object> id;
+        private Map<String, Object> parameter;
+
+        AuditTrailBuilder() {
+        }
+
+        public AuditTrail.AuditTrailBuilder commandType(CommandType commandType) {
+            this.commandType = commandType;
+            return this;
+        }
+
+        public AuditTrail.AuditTrailBuilder label(String label) {
+            this.label = label;
+            return this;
+        }
+
+        public AuditTrail.AuditTrailBuilder content(String content) {
+            this.content = content;
+            return this;
+        }
+
+        public AuditTrail.AuditTrailBuilder diffString(String diffString) {
+            this.diffString = diffString;
+            return this;
+        }
+
+        public AuditTrail.AuditTrailBuilder id(Map<String, Object> id) {
+            this.id = id;
+            return this;
+        }
+
+        public AuditTrail.AuditTrailBuilder parameter(Map<String, Object> parameter) {
+            this.parameter = parameter;
+            return this;
+        }
+
+        public AuditTrail build() {
+            return new AuditTrail(this.commandType, this.label, this.content, this.diffString, this.id, this.parameter);
+        }
     }
 }

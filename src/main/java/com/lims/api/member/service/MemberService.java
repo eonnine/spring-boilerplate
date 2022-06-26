@@ -6,4 +6,8 @@ public interface MemberService {
 
     int updateMember(MemberDto dto);
 
+    int insertMember(MemberDto dto);
+
+    int deleteMember(int id);
+
 }

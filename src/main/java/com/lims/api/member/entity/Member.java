@@ -9,7 +9,6 @@ public class Member {
     @AuditId
     private String userId;
 
-    @AuditId
     private String loginId;
 
     private String userNm;

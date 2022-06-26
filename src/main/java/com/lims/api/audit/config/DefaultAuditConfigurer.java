@@ -2,6 +2,7 @@ package com.lims.api.audit.config;
 
 import com.lims.api.audit.domain.DataBaseType;
 import com.lims.api.audit.domain.DisplayType;
+import com.lims.api.audit.domain.RecordScope;
 import com.lims.api.audit.domain.StringConvertCase;
 
 public class DefaultAuditConfigurer implements AuditConfigurer {
@@ -10,6 +11,14 @@ public class DefaultAuditConfigurer implements AuditConfigurer {
 
     public DefaultAuditConfigurer(AuditProperties auditProperties) {
         this.auditProperties = auditProperties;
+    }
+
+    @Override
+    public RecordScope recordScope() {
+        if (auditProperties.getRecordScope() != null) {
+            return auditProperties.getRecordScope();
+        }
+        return AuditConfigurer.super.recordScope();
     }
 
     @Override

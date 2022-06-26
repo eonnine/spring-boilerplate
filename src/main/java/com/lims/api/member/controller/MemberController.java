@@ -25,24 +25,21 @@ public class MemberController {
 
 
     @PutMapping
-    public ResponseEntity<Integer> updateMember() {
-        MemberDto dto = MemberDto.builder()
-                .userId(102)
-                .loginId("admin")
-                .build();
+    public ResponseEntity<Integer> updateMember(MemberDto dto) {
         int r = memberService.updateMember(dto);
-
         return ResponseEntity.ok(r);
     }
 
-    @PatchMapping
-    public ResponseEntity<Integer> updateMember2() {
-        return ResponseEntity.ok(memberDao.updateMember2(null));
+    @PostMapping
+    public ResponseEntity<Integer> insertMember(MemberDto dto) {
+        int r = memberService.insertMember(dto);
+        return ResponseEntity.ok(r);
     }
 
-    @DeleteMapping
-    public ResponseEntity<Integer> deleteMember() {
-        return null;
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Integer> deleteMember(@PathVariable int id) {
+        int r = memberService.deleteMember(id);
+        return ResponseEntity.ok(r);
     }
 
 }

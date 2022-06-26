@@ -1,59 +1,24 @@
 package com.lims.api.audit.context;
 
+import com.lims.api.audit.domain.AuditAttribute;
 import com.lims.api.audit.domain.AuditTrail;
-import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
-@Component
-public class AuditManager {
+public interface AuditManager {
 
-    private final ConcurrentHashMap<String, List<AuditTrail>> audit = new ConcurrentHashMap<>();
+    void put(String key, AuditAttribute auditTrail);
 
-    public void put(String key, AuditTrail auditTrail) {
-        if (has(key)) {
-            audit.get(key).add(auditTrail);
-        } else {
-            audit.put(key, createList(auditTrail));
-        }
-    }
+    AuditAttribute get(String key);
 
-    public List<AuditTrail> get(String key) {
-        return has(key) ? audit.get(key) : null;
-    }
+    boolean has(String key);
 
-    public AuditTrail getValueLast(String key) {
-        List<AuditTrail> auditTrails = audit.get(key);
-        if (auditTrails.size() == 0) {
-            return null;
-        }
-        return auditTrails.get(auditTrails.size() - 1);
-    }
+    void remove();
 
-    public void remove(String key) {
-        if (has(key)) {
-            audit.remove(key);
-        }
-    }
+    List<AuditAttribute> getAsList();
 
-    public void removeValueLast(String key) {
-        List<AuditTrail> auditTrails = audit.get(key);
-        if (auditTrails.size() == 0) {
-            return;
-        }
-        auditTrails.remove(auditTrails.size() - 1);
-    }
+    void putAudits(List<AuditTrail> audits);
 
-    public boolean has(String key) {
-        return audit.containsKey(key);
-    }
-
-    private List<AuditTrail> createList(AuditTrail auditTrail) {
-        List<AuditTrail> list = new ArrayList<>();
-        list.add(auditTrail);
-        return list;
-    }
+    List<AuditTrail> getAudits();
 
 }

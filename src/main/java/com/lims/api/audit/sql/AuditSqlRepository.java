@@ -7,17 +7,15 @@ import com.lims.api.audit.domain.SqlRow;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class AuditSqlRepository {
-
-    private final String commentSuffix = AbstractSqlGenerator.COMMENT_SUFFIX;
 
     private final DataSource dataSource;
     private final AuditSqlManager sqlManager;
@@ -33,10 +31,14 @@ public class AuditSqlRepository {
         return DataSourceUtils.getConnection(dataSource);
     }
 
-    @Transactional
-    public List<SqlRow> findAllById(Class<?> entityClazz, Object[] parameters) {
+    public List<SqlParameter> getSqlParameters(Class<?> entityClazz, Map<String, Object> parameter) {
         SqlEntity sqlEntity = sqlManager.get(entityClazz.getName());
-        List<SqlParameter> sqlParameters = sqlProvider.getSqlParameter(sqlEntity, parameters);
+        return sqlProvider.getSqlParameters(sqlEntity, parameter);
+    }
+
+    public List<SqlRow> findAllById(Class<?> entityClazz, List<SqlParameter> sqlParameters) {
+        String commentSuffix = AbstractSqlGenerator.COMMENT_SUFFIX;
+        SqlEntity sqlEntity = sqlManager.get(entityClazz.getName());
         String conditionClause = sqlProvider.makeConditionClause(sqlParameters);
 
         String sql = sqlEntity.getSelectClause() + conditionClause;
