@@ -8,7 +8,6 @@ import com.lims.api.auth.service.TokenService;
 import com.lims.api.common.exception.UnAuthenticatedAccessException;
 import com.lims.api.common.session.AuthTokenSession;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;

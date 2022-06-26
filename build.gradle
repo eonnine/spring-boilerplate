@@ -43,6 +43,7 @@ dependencies {
     // mybatis
     implementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter:2.2.2'
 
+    compileOnly fileTree(dir: 'lib', include: ['**/*.jar'])
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     annotationProcessor 'org.projectlombok:lombok'
