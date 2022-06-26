@@ -2,12 +2,9 @@ package com.lims.api.audit.event;
 
 import com.lims.api.audit.domain.AuditTrail;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Slf4j
-@Component
 public class AuditEventPublisher {
 
     private final AuditEventListener eventListener;

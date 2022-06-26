@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class AuditAnnotationReader {
 
     public List<Field> getIdFields(Class<?> clazz) {
@@ -25,7 +24,7 @@ public class AuditAnnotationReader {
     }
 
     public List<String> getIdFieldNames(Class<?> clazz) {
-        return getIdFields(clazz).stream().map(Field::getName).toList();
+        return getIdFields(clazz).stream().map(Field::getName).collect(Collectors.toList());
     }
 
     public Audit getAuditAnnotation(Method method) {

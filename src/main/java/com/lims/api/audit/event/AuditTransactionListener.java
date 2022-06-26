@@ -10,7 +10,6 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Component
 public class AuditTransactionListener implements TransactionSynchronization {
 
     private final AuditConfigurer configurer;

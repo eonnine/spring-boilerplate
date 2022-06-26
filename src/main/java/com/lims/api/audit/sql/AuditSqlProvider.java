@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@Component
 public class AuditSqlProvider {
 
     private final AuditSqlGenerator generator;

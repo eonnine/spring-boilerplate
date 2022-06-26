@@ -1,12 +1,8 @@
 package com.lims.api.audit.domain;
 
 import com.lims.api.audit.config.AuditConfigurer;
-import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class AuditAttribute {
@@ -128,11 +124,11 @@ public class AuditAttribute {
     }
 
     private boolean equalsValue(String s, String s2) {
-        return StringUtils.equals(s, s2);
+        return Objects.equals(s, s2);
     }
 
     private boolean notEqualsValue(String s, String s2) {
-        return !StringUtils.equals(s, s2);
+        return !Objects.equals(s, s2);
     }
 
     private boolean isEmpty(Collection<?> collection) {

@@ -6,7 +6,6 @@ import com.lims.api.audit.domain.SqlParameter;
 import com.lims.api.audit.domain.SqlRow;
 import org.springframework.dao.InvalidDataAccessResourceUsageException;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
 import java.sql.*;
@@ -14,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-@Component
 public class AuditSqlRepository {
 
     private final DataSource dataSource;

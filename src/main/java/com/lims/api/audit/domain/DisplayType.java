@@ -1,6 +1,6 @@
 package com.lims.api.audit.domain;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 
 public enum DisplayType {
     COLUMN(DisplayType::getDisplayName),
@@ -21,7 +21,7 @@ public enum DisplayType {
             return name;
         }
         else if (type.isComment()) {
-            return StringUtils.isEmpty(comment) ? name : comment;
+            return Strings.isEmpty(comment) ? name : comment;
         }
         return "";
     }

@@ -13,7 +13,6 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import java.util.List;
 import java.util.Set;
 
-@Configuration
 public class AuditSqlConfig {
 
     private final AuditSqlManager sqlManager;
@@ -24,7 +23,6 @@ public class AuditSqlConfig {
         this.sqlManager = sqlManager;
         this.sqlProvider = sqlProvider;
         this.annotationReader = annotationReader;
-        initialize();
     }
 
     public void initialize() {

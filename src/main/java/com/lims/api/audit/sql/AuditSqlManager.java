@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
 public class AuditSqlManager {
 
     private final Map<String, SqlEntity> sql = new HashMap<>();

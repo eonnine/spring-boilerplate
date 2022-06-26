@@ -2,19 +2,17 @@ package com.lims.api.audit.util;
 
 import com.lims.api.audit.config.AuditConfigurer;
 import com.lims.api.audit.domain.StringConvertCase;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Component
 public class FieldNameConverter implements StringConverter {
 
-    private final Map<StringConvertCase, Function<String, String>> converter;
     private final AuditConfigurer configurer;
+    private final Map<StringConvertCase, Function<String, String>> converter;
 
     public FieldNameConverter(AuditConfigurer configurer) {
         this.configurer = configurer;
@@ -37,7 +35,7 @@ public class FieldNameConverter implements StringConverter {
     private String snakeToCamel(String str) {
         String[] fragments = str.toLowerCase().split("_");
         return fragments[0] + Arrays.stream(Arrays.copyOfRange(fragments, 1, fragments.length))
-                .map(s -> StringUtils.isEmpty(s) ? s : s.substring(0, 1).toUpperCase() + s.substring(1))
+                .map(s -> Strings.isEmpty(s) ? s : s.substring(0, 1).toUpperCase() + s.substring(1))
                 .collect(Collectors.joining());
     }
 }

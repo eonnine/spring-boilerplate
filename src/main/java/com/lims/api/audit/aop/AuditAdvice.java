@@ -2,25 +2,23 @@ package com.lims.api.audit.aop;
 
 import com.lims.api.audit.context.AnnotationAuditMethodInvocation;
 import com.lims.api.audit.context.AuditManager;
-import com.lims.api.audit.sql.AuditSqlRepository;
 import com.lims.api.audit.event.AuditTransactionListener;
+import com.lims.api.audit.sql.AuditSqlRepository;
 import com.lims.api.audit.util.AuditAnnotationReader;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 
 public class AuditAdvice implements MethodInterceptor {
-
     private final AuditManager auditManager;
     private final AuditSqlRepository repository;
-    private final AuditAnnotationReader annotationReader;
     private final AuditTransactionListener transactionListener;
+    private final AuditAnnotationReader annotationReader;
 
-    public AuditAdvice(AuditManager auditManager, AuditSqlRepository repository, AuditAnnotationReader annotationReader,
-                       AuditTransactionListener transactionListener) {
+    public AuditAdvice(AuditManager auditManager, AuditSqlRepository repository, AuditTransactionListener transactionListener, AuditAnnotationReader annotationReader) {
         this.auditManager = auditManager;
         this.repository = repository;
-        this.annotationReader = annotationReader;
         this.transactionListener = transactionListener;
+        this.annotationReader = annotationReader;
     }
 
     @Override
